@@ -34,7 +34,12 @@ export default function Home() {
               API Key
             </p>
           </button> */}
-          <button className="flex justify-end items-center gap-1.5 p-2 rounded bg-[#d04f17]">
+          <a
+            href="https://github.com/nutlope/billsplit"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex justify-end items-center gap-1.5 p-2 rounded bg-[#d04f17]"
+          >
             <img
               src="/github.svg"
               alt="GitHub Logo"
@@ -44,7 +49,7 @@ export default function Home() {
             <p className="hidden sm:block text-xs sm:text-sm font-medium text-white">
               Star on GitHub
             </p>
-          </button>
+          </a>
         </div>
       </header>
 
@@ -114,11 +119,19 @@ export default function Home() {
       <footer className="w-full flex flex-col sm:flex-row justify-center items-center py-4 mt-auto">
         <p className="text-xs font-medium text-center mb-2 sm:mb-0 sm:mr-2">
           <span className="text-[#99a1af]">Powered by </span>
-          <span className="text-[#4a5565]">Together.ai</span>
+          <a
+            href="https://togetherai.link/"
+            target="_blank"
+            className="text-[#4a5565]"
+          >
+            Together.ai
+          </a>
         </p>
         <div className="flex gap-2">
           <a
-            href="#"
+            href="https://github.com/nutlope/billsplit"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex justify-center items-center w-10 h-10 sm:w-11 sm:h-11 p-1 rounded bg-white border-[0.3px] border-[#D1D5DC]"
           >
             <svg
@@ -143,7 +156,9 @@ export default function Home() {
             </svg>
           </a>
           <a
-            href="#"
+            href="https://x.com/nutlope"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex justify-center items-center w-10 h-10 sm:w-11 sm:h-11 p-1 rounded bg-white border-[0.3px] border-[#D1D5DC]"
           >
             <svg
