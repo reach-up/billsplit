@@ -1,6 +1,7 @@
 "use client";
 
 import SubPageHeader from "@/components/SubPageHeader";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 export default function AppPage() {
@@ -77,17 +78,24 @@ export default function AppPage() {
         backLink="/"
       />
       <div
-        className="flex flex-col justify-start items-start w-[350px] h-[479px] relative overflow-hidden gap-2.5 p-4 rounded-2xl bg-[#faf7f5] border border-gray-200"
+        className="flex flex-col justify-start items-start max-w-[350px] w-full max-h-[479px] h-full relative overflow-hidden gap-2.5 p-4 rounded-2xl bg-[#faf7f5] border border-gray-200"
         style={{ boxShadow: "0px 1px 6px -4px rgba(0,0,0,0.2)" }}
       >
-        <div className="h-[447px] relative overflow-hidden rounded-xl bg-[#f6f0ed] border border-[#d1d5dc] border-dashed">
-          <p className="absolute left-[111.31px] top-[265px] text-base font-medium text-center text-[#364153]">
-            Take a photo{" "}
-          </p>
-          <p className="absolute left-[111.31px] top-[289px] text-xs text-center text-[#4a5565]">
-            or upload receipt
-          </p>
-          <img className="w-[131px] h-[72px]" src="/camera.png" />
+        <div className="h-[447px] w-full relative overflow-hidden rounded-xl bg-[#f6f0ed] border border-[#d1d5dc] border-dashed flex justify-center items-center">
+          <div className="flex flex-col gap-3">
+            <img className="w-[131px] h-[72px]" src="/camera.png" />
+            <div className="flex flex-col">
+              <p className=" ext-base font-medium text-center text-[#364153]">
+                Take a photo
+              </p>
+              <Link
+                href="/app?mode=manual"
+                className="text-xs text-center underline text-[#4a5565]"
+              >
+                or upload receipt
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </>

@@ -1,12 +1,12 @@
 export default function Footer() {
   return (
-    <footer className="w-full flex flex-col sm:flex-row justify-center items-center py-4 mt-auto">
+    <footer className="w-full flex flex-col sm:flex-row justify-center items-center py-4 gap-4 mt-auto">
       <p className="text-xs font-medium text-center mb-2 sm:mb-0 sm:mr-2">
         <span className="text-[#99a1af]">Powered by </span>
         <a
           href="https://togetherai.link/"
           target="_blank"
-          className="text-[#4a5565]"
+          className="text-[#4a5565] underline"
         >
           Together.ai
         </a>
@@ -16,7 +16,7 @@ export default function Footer() {
           href="https://github.com/nutlope/billsplit"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex justify-center items-center w-10 h-10 sm:w-11 sm:h-11 p-1 rounded bg-white border-[0.3px] border-[#D1D5DC]"
+          className="flex justify-center items-center w-5 h-5 rounded bg-white border-[0.3px] border-[#D1D5DC]"
         >
           <svg
             width={12} // Adjusted size for better fit
@@ -43,20 +43,18 @@ export default function Footer() {
           href="https://x.com/nutlope"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex justify-center items-center w-10 h-10 sm:w-11 sm:h-11 p-1 rounded bg-white border-[0.3px] border-[#D1D5DC]"
+          className="flex justify-center items-center w-5 h-5 rounded bg-white border-[0.3px] border-[#D1D5DC]"
         >
           <svg
-            width={12} // Adjusted size for better fit
-            height={12} // Adjusted size for better fit
-            viewBox="0 0 21 21" // Original viewBox maintained for path data
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid meet"
           >
             <path
-              d="M10.7979 5.34375L13.9202 1.71429H13.1803L10.4692 4.86566L8.30391 1.71429H5.8064L9.08081 6.47973L5.8064 10.2857H6.54639L9.40931 6.95783L11.6961 10.2857H14.1935L10.7979 5.34375ZM9.78452 6.52173L9.45272 6.04724L6.81303 2.2713L9.14288 6L11.7143 9.85716L13.1807 9.75404H12.0442L9.78452 6.52173Z"
+              d="M6.79812 5.34371L9.92041 1.71429H9.18053L6.46944 4.86566L4.3041 1.71429H1.80664L5.08106 6.47972L1.80664 10.2857H2.54657L5.40955 6.95777L7.6963 10.2857H10.1938L6.79812 5.34371ZM5.78469 6.52171L5.45292 6.04718L2.81317 2.2713L5.14308 6.00001L7.71451 9.85715L9.18088 9.75405H8.04439L5.78469 6.52171Z"
               fill="#62748E"
-              transform="translate(2.5 4.5)" // Adjust transform to center the X logo if needed
             />
           </svg>
         </a>
