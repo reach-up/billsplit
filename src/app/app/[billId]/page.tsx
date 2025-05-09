@@ -1,10 +1,16 @@
 "use client";
 
 import SubPageHeader from "@/components/SubPageHeader";
-import { useState } from "react";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
+
+// List accepted values
+const viewOptions = ["items", "split", "splitSummary"] as const;
 
 export default function BillPage() {
-  const [view, setView] = useState<"items" | "split" | "splitSummary">("items");
+  const [view, setView] = useQueryState(
+    "view",
+    parseAsStringLiteral(viewOptions)
+  );
 
   if (view === "items") {
     return (
