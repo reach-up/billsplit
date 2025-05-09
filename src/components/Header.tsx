@@ -1,9 +1,11 @@
+import Link from "next/link";
+
 export default function Header() {
   return (
     <header className="w-full flex justify-between items-center py-3 px-2 border-b border-[#d1d5dc] mb-8">
-      <div className="flex flex-row gap-1">
+      <Link href="/" className="flex flex-row gap-1">
         <img src="/logo.svg" alt="Logo" className="h-6 w-6 sm:h-8 sm:w-8" />
-        <p className="hidden sm:block text-xl font-bold text-left">
+        <p className="hidden sm:block text-xl font-bold text-left mt-0.5">
           <span className="text-xl font-bold text-left text-[#1e2939]">
             Bill
           </span>
@@ -11,7 +13,7 @@ export default function Header() {
             Split
           </span>
         </p>
-      </div>
+      </Link>
 
       <div className="flex items-center gap-2">
         {/* <button className="flex justify-center items-center gap-1 px-3 py-2 rounded bg-[#fff9f6] border-[0.7px] border-[#d1d5dc]">
