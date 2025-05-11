@@ -58,7 +58,10 @@ export default function AppPage() {
               Date (optional):
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <label
+                htmlFor="date"
+                className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer"
+              >
                 <svg
                   className="w-5 h-5 text-gray-400"
                   fill="currentColor"
@@ -71,12 +74,12 @@ export default function AppPage() {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-              </div>
+              </label>
               <input
                 type="date"
                 id="date"
                 placeholder="mm/dd/yyyy"
-                className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#d1d5dc] bg-[#FFF9F6] focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#d1d5dc] bg-[#FFF9F6] focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent appearance-none hide-date-icon"
                 {...register("date")}
               />
             </div>
