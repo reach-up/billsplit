@@ -2,6 +2,18 @@
 
 import SubPageHeader from "@/components/SubPageHeader";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+type BillForm = {
+  billItems: PrismaJson.BillItem[];
+
+  subTotal?: Number;
+  totalTaxes?: Number;
+
+  tip?: Number;
+
+  people: PrismaJson.People[];
+};
 
 // List accepted values
 const viewOptions = ["items", "split", "splitSummary"] as const;
@@ -11,6 +23,13 @@ export default function BillPage() {
     "view",
     parseAsStringLiteral(viewOptions)
   );
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<BillForm>();
+  const onSubmit: SubmitHandler<BillForm> = (data) => console.log(data);
 
   if (view === "items") {
     return (
