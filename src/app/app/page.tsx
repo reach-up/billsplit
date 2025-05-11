@@ -3,6 +3,12 @@
 import SubPageHeader from "@/components/SubPageHeader";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+type BasicInfo = {
+  restaurantName?: string;
+  date?: string;
+};
 
 export default function AppPage() {
   const searchParams = useSearchParams();
@@ -10,6 +16,14 @@ export default function AppPage() {
   const mode = searchParams.get("mode");
 
   const isManual = mode === "manual";
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<BasicInfo>();
+  const onSubmit: SubmitHandler<BasicInfo> = (data) => console.log(data);
 
   if (isManual) {
     return (
@@ -20,7 +34,7 @@ export default function AppPage() {
           backLink="/"
         />
 
-        <div className="w-full space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
           <div>
             <label
               htmlFor="restaurant-name"
@@ -33,6 +47,7 @@ export default function AppPage() {
               id="restaurant-name"
               placeholder="e.g. Olive Garden"
               className="w-full px-3 py-2.5 rounded-lg border border-[#d1d5dc] bg-white focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent"
+              {...register("restaurantName")}
             />
           </div>
           <div>
@@ -58,14 +73,21 @@ export default function AppPage() {
                 </svg>
               </div>
               <input
-                type="text"
+                type="date"
                 id="date"
                 placeholder="mm/dd/yyyy"
                 className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#d1d5dc] bg-[#FFF9F6] focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent"
+                {...register("date")}
               />
             </div>
           </div>
-        </div>
+          <button
+            type="submit"
+            className="w-full px-3 py-2.5 rounded-lg bg-[#d04f17] text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:ring-offset-2"
+          >
+            Continue
+          </button>
+        </form>
       </>
     );
   }
