@@ -4,15 +4,24 @@ import SubPageHeader from "@/components/SubPageHeader";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useForm, SubmitHandler } from "react-hook-form";
 
+type People = {
+  name: string;
+  uuid: string;
+};
+type BillItem = {
+  name: string;
+  price: number;
+};
+
 type BillForm = {
-  billItems: PrismaJson.BillItem[];
+  billItems: BillItem[];
 
   subTotal?: Number;
   totalTaxes?: Number;
 
   tip?: Number;
 
-  people: PrismaJson.People[];
+  people: People[];
 };
 
 // List accepted values
