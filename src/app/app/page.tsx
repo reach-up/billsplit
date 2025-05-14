@@ -1,5 +1,6 @@
 "use client";
 
+import { DatePicker } from "@/components/DatePicker";
 import SubPageHeader from "@/components/SubPageHeader";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -7,7 +8,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 type BasicInfo = {
   restaurantName?: string;
-  date?: string;
+  date?: Date;
 };
 
 export default function AppPage() {
@@ -57,32 +58,14 @@ export default function AppPage() {
             >
               Date (optional):
             </label>
-            <div className="relative">
-              <label
-                htmlFor="date"
-                className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer"
-              >
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </label>
-              <input
-                type="date"
-                id="date"
-                placeholder="mm/dd/yyyy"
-                className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-[#d1d5dc] bg-[#FFF9F6] focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent appearance-none hide-date-icon"
-                {...register("date")}
-              />
-            </div>
+            <DatePicker
+              date={watch("date")}
+              onDateChange={(date) => {
+                register("date").onChange({
+                  target: { value: date, name: "date" },
+                });
+              }}
+            />
           </div>
           <button
             type="submit"
