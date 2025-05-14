@@ -8,6 +8,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { ReceiptItems } from "./ReceiptItems";
 
 type People = {
   name: string;
@@ -19,7 +20,7 @@ type BillItem = {
   price: number;
 };
 
-type BillForm = {
+export type BillForm = {
   restaurantName?: string;
   date?: Date;
   billItems: BillItem[];
@@ -42,13 +43,15 @@ export default function AppPage() {
     parseAsStringLiteral(viewOptions)
   );
 
+  const formObject = useForm<BillForm>();
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
-  } = useForm<BillForm>();
+  } = formObject;
 
   // Load saved form data from localStorage on component mount
   useEffect(() => {
@@ -74,17 +77,11 @@ export default function AppPage() {
 
   if (view === "items") {
     return (
-      <>
-        <SubPageHeader
-          title="Receipt Items"
-          description="List all the items on your receipt"
-          onBack={() => setView("intro")}
-        />
-        <div></div>
-        <Button className="w-full" onClick={() => setView("split")}>
-          <span>Continue</span>
-        </Button>
-      </>
+      <ReceiptItems
+        formObject={formObject}
+        goBack={() => setView("intro")}
+        goForward={() => setView("split")}
+      />
     );
   }
 
