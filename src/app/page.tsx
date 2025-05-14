@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -29,21 +30,19 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full max-w-xs sm:max-w-sm space-y-3">
-          <Link
-            href="/app?mode=camera"
-            className="w-full flex justify-center items-center gap-2 px-3.5 py-3 rounded-lg bg-[#d04f17] text-white"
-          >
-            <img src="/camera.svg" className="w-4 h-4" />
-            <p className="text-base font-semibold">Scan Receipt</p>
+        <div className="w-full max-w-xs sm:max-w-sm flex flex-col gap-4">
+          <Link href="/app?mode=camera">
+            <Button className="w-full cursor-pointer">
+              <img src="/camera.svg" className="w-4 h-4" />
+              <p className="text-base font-semibold">Scan Receipt</p>
+            </Button>
           </Link>
-          <Link
-            href="/app?mode=manual"
-            className="w-full flex justify-center items-center gap-1.5 p-3 rounded-lg bg-[#fff9f6] border-[0.7px] border-[#d1d5dc]"
-          >
-            <p className="text-base font-medium text-[#364153]">
-              Enter Manually
-            </p>
+          <Link href="/app?mode=manual">
+            <Button variant="secondary" className="w-full cursor-pointer">
+              <p className="text-base font-medium text-[#364153]">
+                Enter Manually
+              </p>
+            </Button>
           </Link>
         </div>
       </main>

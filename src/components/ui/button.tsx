@@ -5,14 +5,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent px-3 py-2.5 rounded-lg text-base font-semibold border",
   {
     variants: {
       variant: {
-        primary:
-          "bg-[#d04f17] text-white px-3.5 py-3 rounded-lg text-base font-semibold",
-        secondary:
-          "bg-[#fff9f6] text-[#364153] border-[0.7px] border-[#d1d5dc] p-3 rounded-lg text-base font-medium gap-1.5",
+        primary: "bg-[#d04f17] text-white",
+        secondary: "bg-[#fff9f6] text-[#364153] border-[#d1d5dc]",
       },
     },
     defaultVariants: {

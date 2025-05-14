@@ -1,19 +1,19 @@
-import Link from "next/link";
-
 export default function SubPageHeader({
   title,
   description,
-  backLink,
+  onBack,
 }: {
   title: string;
   description?: string;
-  backLink: string;
+  onBack?: () => void;
 }) {
   return (
     <div className="flex flex-col gap-3 pb-6">
-      <Link
-        href={backLink}
-        className="flex items-center gap-2 text-sm text-[#4a5565] hover:text-[#1e2939]"
+      <div
+        onClick={() => {
+          onBack?.();
+        }}
+        className="cursor-pointer flex items-center gap-2 text-sm text-[#4a5565] hover:text-[#1e2939]"
       >
         <svg
           width="16"
@@ -31,7 +31,7 @@ export default function SubPageHeader({
           />
         </svg>
         Back
-      </Link>
+      </div>
       <h1 className="text-2xl font-medium text-[#1e2939]">{title}</h1>
       {description && (
         <p className="text-base text-left text-[#4a5565]">{description}</p>

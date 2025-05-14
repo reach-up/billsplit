@@ -3,28 +3,122 @@
 import { DatePicker } from "@/components/DatePicker";
 import SubPageHeader from "@/components/SubPageHeader";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
-type BasicInfo = {
-  restaurantName?: string;
-  date?: Date;
+type People = {
+  name: string;
+  uuid: string;
 };
 
+type BillItem = {
+  name: string;
+  price: number;
+};
+
+type BillForm = {
+  restaurantName?: string;
+  date?: Date;
+  billItems: BillItem[];
+  subTotal?: Number;
+  totalTaxes?: Number;
+  tip?: Number;
+  people: People[];
+};
+
+const viewOptions = ["intro", "items", "split", "splitSummary"] as const;
+
 export default function AppPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-
   const mode = searchParams.get("mode");
-
   const isManual = mode === "manual";
+
+  const [view, setView] = useQueryState(
+    "view",
+    parseAsStringLiteral(viewOptions)
+  );
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
-  } = useForm<BasicInfo>();
-  const onSubmit: SubmitHandler<BasicInfo> = (data) => console.log(data);
+  } = useForm<BillForm>();
+
+  // Load saved form data from localStorage on component mount
+  useEffect(() => {
+    const savedFormData = localStorage.getItem("billFormData");
+    if (savedFormData) {
+      const parsedData = JSON.parse(savedFormData);
+      Object.entries(parsedData).forEach(([key, value]) => {
+        setValue(key as keyof BillForm, value as BillForm[keyof BillForm]);
+      });
+    }
+  }, [setValue]);
+
+  // Save form data to localStorage whenever it changes
+  const formData = watch();
+  useEffect(() => {
+    localStorage.setItem("billFormData", JSON.stringify(formData));
+  }, [formData]);
+
+  const onSubmit: SubmitHandler<BillForm> = (data) => {
+    console.log(data);
+    localStorage.removeItem("billFormData"); // Clear saved data after submission
+  };
+
+  if (view === "items") {
+    return (
+      <>
+        <SubPageHeader
+          title="Receipt Items"
+          description="List all the items on your receipt"
+          onBack={() => setView("intro")}
+        />
+        <div></div>
+        <Button className="w-full" onClick={() => setView("split")}>
+          <span>Continue</span>
+        </Button>
+      </>
+    );
+  }
+
+  if (view === "split") {
+    return (
+      <>
+        <SubPageHeader
+          title="Who's Splitting?"
+          description="Type all the names and assign items"
+          onBack={() => setView("items")}
+        />
+        <div></div>
+        <Button className="w-full" onClick={() => setView("splitSummary")}>
+          <span>Continue</span>
+        </Button>
+      </>
+    );
+  }
+
+  if (view === "splitSummary") {
+    return (
+      <>
+        <SubPageHeader
+          title="Split Summary"
+          description="Here is how you should split this bill:"
+          onBack={() => setView("split")}
+        />
+        <div></div>
+        <Button className="w-full" onClick={handleSubmit(onSubmit)}>
+          <span>Share</span>
+        </Button>
+      </>
+    );
+  }
 
   if (isManual) {
     return (
@@ -32,7 +126,7 @@ export default function AppPage() {
         <SubPageHeader
           title="Manual Entry"
           description="Take a photo or upload an image of your receipt"
-          backLink="/"
+          onBack={() => router.push("/")}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
@@ -67,13 +161,10 @@ export default function AppPage() {
               }}
             />
           </div>
-          <button
-            type="submit"
-            className="w-full px-3 py-2.5 rounded-lg bg-[#d04f17] text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:ring-offset-2"
-          >
-            Continue
-          </button>
         </form>
+        <Button className="w-full" onClick={() => setView("items")}>
+          <span>Continue</span>
+        </Button>
       </>
     );
   }
@@ -83,7 +174,9 @@ export default function AppPage() {
       <SubPageHeader
         title="Scan Receipt"
         description="Take a photo or upload  an image of your receipt"
-        backLink="/"
+        onBack={() => {
+          router.push("/");
+        }}
       />
       <div
         className="flex flex-col justify-start items-start max-w-[350px] w-full max-h-[479px] h-full relative overflow-hidden gap-2.5 p-4 rounded-2xl bg-[#faf7f5] border border-gray-200"
