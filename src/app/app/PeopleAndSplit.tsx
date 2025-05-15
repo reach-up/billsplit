@@ -4,7 +4,7 @@ import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { BillForm } from "./types";
 import { InputText } from "./InputText";
 import { useMemo } from "react";
-import { createPersonId } from "./utils";
+import { createId } from "./utils";
 import Decimal from "decimal.js";
 
 const TinyButton = ({
@@ -54,13 +54,13 @@ export const PeopleAndSplit = ({
     name: "people",
   });
 
-  const { fields: products } = useFieldArray({
+  const { fields: products, update: updateProduct } = useFieldArray({
     control: formObject.control,
     name: "billItems",
   });
 
   const handleAddPerson = () => {
-    append({ name: "", id: createPersonId() });
+    append({ name: "", id: createId() });
   };
 
   const isDisabled = useMemo(() => {
@@ -97,6 +97,7 @@ export const PeopleAndSplit = ({
     }
     formObject.setValue("splitEvenly", !splitEvenly);
   };
+
   return (
     <>
       <SubPageHeader
@@ -151,28 +152,22 @@ export const PeopleAndSplit = ({
           </TinyButton>
         </div>
         <div className="flex flex-col gap-2 w-full">
-          {products?.map((product, index) => {
+          {products?.map((product, productIndex) => {
             return (
-              <div key={product.id} className="w-full max-w-[350px]">
+              <div key={productIndex} className="w-full max-w-[350px]">
                 <div className="grid grid-cols-[1fr_auto] px-4 py-3 rounded-lg bg-[#F7F5F5] border border-[#d1d5dc]">
                   <div className="space-y-3">
                     <p className="text-base text-[#1e2939]">{product.name}</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {people.map((person, index) => {
+                      {people.map((person, personIndex) => {
                         const personName = formObject.watch(
-                          `people.${index}.name`
+                          `people.${personIndex}.name`
                         );
                         return (
                           <TinyButton
                             key={person.id}
                             isActive={product.assignedTo?.includes(person.id)}
                             onClick={() => {
-                              console.log(
-                                "clicked",
-                                personName,
-                                "on ",
-                                product.name
-                              );
                               const currentAssigned = product.assignedTo || [];
                               const newAssigned = currentAssigned.includes(
                                 person.id
@@ -181,10 +176,11 @@ export const PeopleAndSplit = ({
                                     (id) => id !== person.id
                                   )
                                 : [...currentAssigned, person.id];
-                              formObject.setValue(
-                                `billItems.${index}.assignedTo`,
-                                newAssigned
-                              );
+
+                              updateProduct(productIndex, {
+                                ...product,
+                                assignedTo: newAssigned,
+                              });
                             }}
                             className="rounded-lg"
                           >
@@ -197,12 +193,7 @@ export const PeopleAndSplit = ({
                   <div className="text-base font-medium text-right">
                     <span className="text-[#6a7282]">$</span>
                     <span className="text-[#1e2939] whitespace-nowrap">
-                      {(product.price instanceof Decimal
-                        ? product.price
-                        : new Decimal(product.price)
-                      )
-                        .toDecimalPlaces(2)
-                        .toString()}
+                      {product.price.toString()}
                     </span>
                   </div>
                 </div>

@@ -6,6 +6,7 @@ type People = {
 import Decimal from "decimal.js";
 
 type BillItem = {
+  id: string;
   name: string;
   price: Decimal;
   assignedTo?: string[];

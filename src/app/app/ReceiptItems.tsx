@@ -5,7 +5,7 @@ import { BillForm } from "./types";
 import { InputPrice } from "./InputPrice";
 import { useMemo } from "react";
 import { InputText } from "./InputText";
-import { getTotal } from "./utils";
+import { createId, getTotal } from "./utils";
 import Decimal from "decimal.js";
 
 export const ReceiptItems = ({
@@ -23,7 +23,7 @@ export const ReceiptItems = ({
   });
 
   const handleAddItem = () => {
-    append({ name: "", price: new Decimal(0) });
+    append({ name: "", price: new Decimal(0), id: createId() });
   };
 
   const total = useMemo(() => {

@@ -17,6 +17,6 @@ export const getTotal = (bill: BillForm): Decimal => {
   return finalTotal;
 };
 
-export const createPersonId = () => {
+export const createId = () => {
   return nanoid(4);
 };
