@@ -9,26 +9,8 @@ import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ReceiptItems } from "./ReceiptItems";
-
-type People = {
-  name: string;
-  uuid: string;
-};
-
-type BillItem = {
-  name: string;
-  price: number;
-};
-
-export type BillForm = {
-  restaurantName?: string;
-  date?: Date;
-  billItems: BillItem[];
-  subTotal?: Number;
-  tax?: Number;
-  tip?: Number;
-  people: People[];
-};
+import { BillForm } from "./types";
+import { PeopleAndSplit } from "./PeopleAndSplit";
 
 const viewOptions = ["intro", "items", "split", "splitSummary"] as const;
 
@@ -87,17 +69,11 @@ export default function AppPage() {
 
   if (view === "split") {
     return (
-      <>
-        <SubPageHeader
-          title="Who's Splitting?"
-          description="Type all the names and assign items"
-          onBack={() => setView("items")}
-        />
-        <div></div>
-        <Button className="w-full" onClick={() => setView("splitSummary")}>
-          <span>Continue</span>
-        </Button>
-      </>
+      <PeopleAndSplit
+        formObject={formObject}
+        goBack={() => setView("items")}
+        goForward={() => setView("splitSummary")}
+      />
     );
   }
 
