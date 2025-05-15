@@ -7,7 +7,7 @@ type InputPriceProps = InputHTMLAttributes<HTMLInputElement> & {
 export const InputPrice = ({ className = "", ...props }: InputPriceProps) => {
   return (
     <div
-      className={`flex justify-start items-center flex-grow-0 flex-shrink-0 w-[100px] relative overflow-hidden gap-1.5 p-3 rounded-lg bg-white border-[0.7px] border-[#d1d5dc] ${className}`}
+      className={`flex justify-start items-center flex-grow-0  w-[100px] relative overflow-hidden gap-1.5 p-3 rounded-lg bg-white border-[0.7px] border-[#d1d5dc] ${className}`}
     >
       <span className="text-base font-medium text-[#1e2939]">$</span>
       <input

@@ -7,7 +7,7 @@ type InputTextProps = InputHTMLAttributes<HTMLInputElement> & {
 export const InputText = ({ className = "", ...props }: InputTextProps) => {
   return (
     <div
-      className={`flex justify-start items-center flex-grow-0 flex-shrink-0 relative overflow-hidden gap-1.5 p-3 rounded-lg bg-white border-[0.7px] border-[#d1d5dc] ${className}`}
+      className={`flex justify-start items-center flex-grow-0  relative overflow-hidden gap-1.5 p-3 rounded-lg bg-white border-[0.7px] border-[#d1d5dc] ${className}`}
     >
       <input
         type="text"

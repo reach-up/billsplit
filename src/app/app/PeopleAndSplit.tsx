@@ -24,10 +24,9 @@ export const PeopleAndSplit = ({
   };
 
   const isDisabled = useMemo(() => {
-    const people = formObject.watch("people");
+    const people = formObject.watch("people") || [];
     return people.length === 0 || people.some((field) => field.name === "");
   }, [formObject.watch("people")]);
-
   return (
     <>
       <SubPageHeader
@@ -38,7 +37,7 @@ export const PeopleAndSplit = ({
       <div className="flex flex-col gap-3 w-full">
         {fields.map((field, index) => (
           <div
-            className="flex justify-start items-center w-[350px] relative gap-2"
+            className="flex justify-start items-center relative gap-2"
             key={field.id}
           >
             <InputText
@@ -51,7 +50,7 @@ export const PeopleAndSplit = ({
               onClick={() => {
                 remove(index);
               }}
-              className="flex-shrink-0 hover:opacity-80 cursor-pointer"
+              className=" hover:opacity-80 cursor-pointer"
             >
               <img src="/trash.svg" className="size-[42px]" />
             </button>
@@ -59,11 +58,11 @@ export const PeopleAndSplit = ({
         ))}
         <button
           onClick={handleAddPerson}
-          className="flex justify-start items-center w-full relative overflow-hidden gap-1.5 p-3 rounded-lg bg-[#f4eeec] border border-[#d1d5dc] hover:bg-[#ebe2df] transition-colors cursor-pointer max-w-[291px]"
+          className="flex justify-start items-center w-full relative overflow-hidden gap-1.5 p-3 rounded-lg bg-[#f4eeec] border border-[#d1d5dc] hover:bg-[#ebe2df] transition-colors cursor-pointer"
         >
           <img src="/add.svg" className="size-4" />
 
-          <p className="flex-grow-0 flex-shrink-0 text-base font-medium text-center text-[#1d293d]">
+          <p className="flex-grow-0  text-base font-medium text-center text-[#1d293d]">
             Add Person
           </p>
         </button>

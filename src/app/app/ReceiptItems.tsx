@@ -40,7 +40,7 @@ export const ReceiptItems = ({
   ]);
 
   const isDisabled = useMemo(() => {
-    const products = formObject.watch("billItems");
+    const products = formObject.watch("billItems") || [];
     return (
       products.length === 0 ||
       products.some((field) => field.name === "") ||
@@ -58,7 +58,7 @@ export const ReceiptItems = ({
       <div className="flex flex-col gap-3">
         {fields.map((field, index) => (
           <div
-            className="flex justify-start items-center w-[350px] relative gap-2"
+            className="flex justify-start items-center relative gap-2"
             key={field.id}
           >
             <InputText
@@ -72,7 +72,7 @@ export const ReceiptItems = ({
             />
             <button
               onClick={() => remove(index)}
-              className="flex-shrink-0 hover:opacity-80 cursor-pointer"
+              className=" hover:opacity-80 cursor-pointer"
             >
               <img src="/trash.svg" className="size-[42px]" />
             </button>
@@ -80,10 +80,10 @@ export const ReceiptItems = ({
         ))}
         <button
           onClick={handleAddItem}
-          className="flex justify-start items-center w-full relative overflow-hidden gap-1.5 p-3 rounded-lg bg-[#f4eeec] border border-[#d1d5dc] hover:bg-[#ebe2df] transition-colors cursor-pointer max-w-[291px]"
+          className="flex justify-start items-center w-full relative overflow-hidden gap-1.5 p-3 rounded-lg bg-[#f4eeec] border border-[#d1d5dc] hover:bg-[#ebe2df] transition-colors cursor-pointer"
         >
           <img src="/add.svg" className="size-4" />
-          <p className="flex-grow-0 flex-shrink-0 text-base font-medium text-center text-[#1d293d]">
+          <p className="flex-grow-0  text-base font-medium text-center text-[#1d293d]">
             Add Item
           </p>
         </button>

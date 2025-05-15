@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ReceiptItems } from "./ReceiptItems";
 import { BillForm } from "./types";
 import { PeopleAndSplit } from "./PeopleAndSplit";
+import { SplitSummary } from "./SplitSummary";
 
 const viewOptions = ["intro", "items", "split", "splitSummary"] as const;
 
@@ -79,17 +80,7 @@ export default function AppPage() {
 
   if (view === "splitSummary") {
     return (
-      <>
-        <SubPageHeader
-          title="Split Summary"
-          description="Here is how you should split this bill:"
-          onBack={() => setView("split")}
-        />
-        <div></div>
-        <Button className="w-full" onClick={handleSubmit(onSubmit)}>
-          <span>Share</span>
-        </Button>
-      </>
+      <SplitSummary goBack={() => setView("split")} formObject={formObject} />
     );
   }
 
