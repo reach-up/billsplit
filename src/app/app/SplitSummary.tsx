@@ -5,7 +5,6 @@ import { BillForm } from "./types";
 import Link from "next/link";
 import { useMemo } from "react";
 import { getTotal } from "./utils";
-import Decimal from "decimal.js";
 
 export const SplitSummary = ({
   goBack,
