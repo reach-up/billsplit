@@ -32,13 +32,13 @@ export default function Home() {
 
         <div className="w-full max-w-xs sm:max-w-sm flex flex-col gap-4">
           <Link href="/app?mode=camera">
-            <Button className="w-full cursor-pointer">
+            <Button className="w-full">
               <img src="/camera.svg" className="w-4 h-4" />
               <p className="text-base font-semibold">Scan Receipt</p>
             </Button>
           </Link>
           <Link href="/app?mode=manual">
-            <Button variant="secondary" className="w-full cursor-pointer">
+            <Button variant="secondary" className="w-full">
               <p className="text-base font-medium text-[#364153]">
                 Enter Manually
               </p>
