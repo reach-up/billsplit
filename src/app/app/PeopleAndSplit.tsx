@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { BillForm } from "./types";
 import { InputText } from "./InputText";
+import { useMemo } from "react";
 
 export const PeopleAndSplit = ({
   goBack,
@@ -22,6 +23,11 @@ export const PeopleAndSplit = ({
     append({ name: "" });
   };
 
+  const isDisabled = useMemo(() => {
+    const people = formObject.watch("people");
+    return people.length === 0 || people.some((field) => field.name === "");
+  }, [formObject.watch("people")]);
+
   return (
     <>
       <SubPageHeader
@@ -35,7 +41,11 @@ export const PeopleAndSplit = ({
             className="flex justify-start items-center w-[350px] relative gap-2"
             key={field.id}
           >
-            <InputText placeholder="Person name" {...field} />
+            <InputText
+              placeholder="Person name"
+              className="w-full max-w-[300px]"
+              {...formObject.register(`people.${index}.name`)}
+            />
 
             <button
               onClick={() => {
@@ -59,7 +69,7 @@ export const PeopleAndSplit = ({
         </button>
         <div className="h-[1px] bg-[#D1D5DC] -mx-[100vw] mt-5" />
       </div>
-      <Button className="w-full mt-6" onClick={goForward}>
+      <Button className="w-full mt-6" onClick={goForward} disabled={isDisabled}>
         <span>Continue</span>
       </Button>
     </>

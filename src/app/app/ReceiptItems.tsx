@@ -39,6 +39,15 @@ export const ReceiptItems = ({
     formObject.watch("tax"),
   ]);
 
+  const isDisabled = useMemo(() => {
+    const products = formObject.watch("billItems");
+    return (
+      products.length === 0 ||
+      products.some((field) => field.name === "") ||
+      total === 0
+    );
+  }, [formObject.watch("billItems"), total]);
+
   return (
     <>
       <SubPageHeader
@@ -108,7 +117,7 @@ export const ReceiptItems = ({
           </p>
         </div>
       </div>
-      <Button className="w-full mt-6" onClick={goForward}>
+      <Button className="w-full mt-6" onClick={goForward} disabled={isDisabled}>
         <span>Continue</span>
       </Button>
     </>
