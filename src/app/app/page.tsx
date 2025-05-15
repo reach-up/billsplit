@@ -25,7 +25,7 @@ export type BillForm = {
   date?: Date;
   billItems: BillItem[];
   subTotal?: Number;
-  totalTaxes?: Number;
+  tax?: Number;
   tip?: Number;
   people: People[];
 };
