@@ -54,7 +54,6 @@ export default function AppPage() {
   }, [formData]);
 
   const onSubmit: SubmitHandler<BillForm> = (data) => {
-    console.log(data);
     localStorage.removeItem("billFormData"); // Clear saved data after submission
   };
 

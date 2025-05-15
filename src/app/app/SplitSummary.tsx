@@ -19,7 +19,11 @@ export const SplitSummary = ({
     name: "people",
   });
 
-  const amountsForPeople = useMemo(() => {
+  const isEvenly = useMemo(() => {
+    return formObject.watch().splitEvenly;
+  }, [formObject.watch()]);
+
+  const amountsForPeopleEvenly = useMemo(() => {
     const total = getTotal(formObject.watch());
     const people = formObject.watch().people || [];
 
@@ -69,7 +73,7 @@ export const SplitSummary = ({
                 {" "}
               </span>
               <span className="text-xl font-medium text-right text-[#1e2939]">
-                {amountsForPeople[index].toString()}
+                {isEvenly ? amountsForPeopleEvenly[index].toString() : "TODO"}
               </span>
             </p>
           </div>

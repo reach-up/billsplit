@@ -1,5 +1,6 @@
 import { BillForm } from "./types";
 import Decimal from "decimal.js";
+import { nanoid } from "nanoid";
 
 export const getTotal = (bill: BillForm): Decimal => {
   let total = new Decimal(0);
@@ -12,7 +13,10 @@ export const getTotal = (bill: BillForm): Decimal => {
   const tax = bill.tax || new Decimal(0);
 
   const finalTotal = total.plus(tip).plus(tax);
-  console.log("total", finalTotal.toString());
 
   return finalTotal;
+};
+
+export const createPersonId = () => {
+  return nanoid(4);
 };

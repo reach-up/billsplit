@@ -4,6 +4,7 @@ import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { BillForm } from "./types";
 import { InputText } from "./InputText";
 import { useMemo } from "react";
+import { createPersonId } from "./utils";
 
 const TinyButton = ({
   isActive,
@@ -58,7 +59,7 @@ export const PeopleAndSplit = ({
   });
 
   const handleAddPerson = () => {
-    append({ name: "" });
+    append({ name: "", id: createPersonId() });
   };
 
   const isDisabled = useMemo(() => {
@@ -149,7 +150,7 @@ export const PeopleAndSplit = ({
           </TinyButton>
         </div>
         <div className="flex flex-col gap-2 w-full">
-          {products.map((product, index) => {
+          {products?.map((product, index) => {
             return (
               <div key={product.id} className="w-full max-w-[350px]">
                 <div className="grid grid-cols-[1fr_auto] gap-4 px-4 py-3 rounded-lg bg-[#F7F5F5] border border-[#d1d5dc]">
@@ -165,6 +166,12 @@ export const PeopleAndSplit = ({
                             key={person.id}
                             isActive={product.assignedTo?.includes(person.id)}
                             onClick={() => {
+                              console.log(
+                                "clicked",
+                                personName,
+                                "on ",
+                                product.name
+                              );
                               const currentAssigned = product.assignedTo || [];
                               const newAssigned = currentAssigned.includes(
                                 person.id

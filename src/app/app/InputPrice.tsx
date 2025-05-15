@@ -23,13 +23,36 @@ export const InputPrice = ({
   }, [value]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "-" || e.key === "+" || e.key === ",") {
+    // Allow only numbers, decimal point, minus sign, and control keys
+    const allowedKeys = [
+      "-",
+      ".",
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Tab",
+    ];
+    if (!allowedKeys.includes(e.key) && !/^\d$/.test(e.key)) {
+      e.preventDefault();
+    }
+    // Prevent multiple decimal points
+    if (e.key === "." && inputValue.includes(".")) {
+      e.preventDefault();
+    }
+    // Allow minus sign only at the start
+    if (e.key === "-" && e.currentTarget.selectionStart !== 0) {
       e.preventDefault();
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue = e.target.value.replace(/,/g, ".");
+    let newValue = e.target.value;
+
+    // Validate the input format
+    if (!/^-?\d*\.?\d*$/.test(newValue)) {
+      return;
+    }
 
     // Limit to 2 decimal places
     const decimalParts = newValue.split(".");
@@ -75,11 +98,7 @@ export const InputPrice = ({
     >
       <span className="text-base font-medium text-[#1e2939]">$</span>
       <input
-        type="string"
-        step="0.01"
-        min="0"
-        inputMode="decimal"
-        pattern="[0-9]*[.]*[0-9]*"
+        type="text"
         className="w-full text-base font-medium text-[#1e2939] bg-transparent border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         placeholder="0.00"
         value={inputValue}
