@@ -15,4 +15,5 @@ export type BillForm = {
   tax?: Number;
   tip?: Number;
   people: People[];
+  splitEvenly?: boolean;
 };
