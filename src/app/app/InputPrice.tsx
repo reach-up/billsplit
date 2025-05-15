@@ -1,28 +1,64 @@
-import { InputHTMLAttributes } from "react";
+import { InputHTMLAttributes, useState, useEffect } from "react";
+import Decimal from "decimal.js";
 
-type InputPriceProps = InputHTMLAttributes<HTMLInputElement> & {
+type InputPriceProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange"
+> & {
   className?: string;
+  value?: Decimal;
+  onChange?: (value: Decimal) => void;
 };
 
 export const InputPrice = ({
   className = "",
+  value,
   onChange,
   ...props
 }: InputPriceProps) => {
+  const [inputValue, setInputValue] = useState(value?.toString() || "");
+
+  useEffect(() => {
+    setInputValue(value?.toString() || "");
+  }, [value]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "-" || e.key === "+") {
+    if (e.key === "-" || e.key === "+" || e.key === ",") {
       e.preventDefault();
     }
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value.includes(".")) {
-      const [, decimal] = value.split(".");
-      if (decimal?.length > 2) {
-        e.target.value = Number(value).toFixed(2);
-      }
+    const newValue = e.target.value;
+    setInputValue(newValue);
+
+    if (newValue === "") {
+      onChange?.(new Decimal(0));
+      return;
     }
-    onChange?.(e);
+
+    try {
+      const decimalValue = new Decimal(newValue);
+      onChange?.(decimalValue);
+    } catch (error) {
+      console.error("Invalid decimal value:", error);
+    }
+  };
+
+  const handleBlur = () => {
+    if (inputValue === "") {
+      onChange?.(new Decimal(0));
+      return;
+    }
+
+    try {
+      const decimalValue = new Decimal(inputValue);
+      onChange?.(decimalValue);
+      setInputValue(decimalValue.toString());
+    } catch (error) {
+      console.error("Invalid decimal value:", error);
+      setInputValue(value?.toString() || "");
+    }
   };
 
   return (
@@ -38,7 +74,9 @@ export const InputPrice = ({
         pattern="[0-9]*[.]*[0-9]*"
         className="w-full text-base font-medium text-[#1e2939] bg-transparent border-none focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         placeholder="0.00"
+        value={inputValue}
         onChange={handleChange}
+        onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         {...props}
       />

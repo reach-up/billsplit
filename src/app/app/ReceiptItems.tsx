@@ -6,6 +6,7 @@ import { InputPrice } from "./InputPrice";
 import { useMemo } from "react";
 import { InputText } from "./InputText";
 import { getTotal } from "./utils";
+import Decimal from "decimal.js";
 
 export const ReceiptItems = ({
   goBack,
@@ -22,7 +23,7 @@ export const ReceiptItems = ({
   });
 
   const handleAddItem = () => {
-    append({ name: "", price: 0 });
+    append({ name: "", price: new Decimal(0) });
   };
 
   const total = useMemo(() => {
@@ -34,7 +35,7 @@ export const ReceiptItems = ({
     return (
       products.length === 0 ||
       products.some((field) => field.name === "") ||
-      total === 0
+      total.equals(0)
     );
   }, [formObject.watch("billItems"), total]);
 
@@ -56,9 +57,10 @@ export const ReceiptItems = ({
               {...formObject.register(`billItems.${index}.name`)}
             />
             <InputPrice
-              {...formObject.register(`billItems.${index}.price` as const, {
-                valueAsNumber: true,
-              })}
+              value={field.price}
+              onChange={(value) => {
+                formObject.setValue(`billItems.${index}.price`, value);
+              }}
             />
             <button
               onClick={() => remove(index)}
@@ -82,7 +84,8 @@ export const ReceiptItems = ({
           <div className="flex flex-col gap-2">
             <p className="text-sm text-left text-[#1e2939]">Tip:</p>
             <InputPrice
-              {...formObject.register("tip")}
+              value={formObject.watch("tip")}
+              onChange={(value) => formObject.setValue("tip", value)}
               className="w-full"
               placeholder="0.00"
             />
@@ -90,7 +93,8 @@ export const ReceiptItems = ({
           <div className="flex flex-col gap-2">
             <p className="text-sm text-left text-[#1e2939]">Tax:</p>
             <InputPrice
-              {...formObject.register("tax")}
+              value={formObject.watch("tax")}
+              onChange={(value) => formObject.setValue("tax", value)}
               className="w-full"
               placeholder="0.00"
             />

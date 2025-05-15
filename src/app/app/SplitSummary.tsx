@@ -5,6 +5,7 @@ import { BillForm } from "./types";
 import Link from "next/link";
 import { useMemo } from "react";
 import { getTotal } from "./utils";
+import Decimal from "decimal.js";
 
 export const SplitSummary = ({
   goBack,
@@ -31,17 +32,14 @@ export const SplitSummary = ({
     // if we have 3 people, we want to split the total by 3 but the number is 7 we need to give to one person and extra cent to make it even, we determine this based on if total is perfectly dividable to the amount of people
     // if total is not perfectly dividable to the amount of people, we want to give the extra cent to the first person
 
-    const isDividable = total % amountOfPeople === 0;
+    const amountForEachPerson = total.dividedBy(amountOfPeople);
+    const remainder = total.minus(amountForEachPerson.times(amountOfPeople));
 
-    const amountForEachPerson = Number((total / amountOfPeople).toFixed(2));
-
-    return people.map((person, index) => {
-      const amount = isDividable
-        ? amountForEachPerson
-        : index === 0
-        ? amountForEachPerson + 0.01
+    return people.map((_, index) => {
+      // Add any remainder to the first person's amount
+      return index === 0
+        ? amountForEachPerson.plus(remainder)
         : amountForEachPerson;
-      return amount;
     });
   }, [formObject.watch()]);
 
@@ -69,13 +67,12 @@ export const SplitSummary = ({
                 {" "}
               </span>
               <span className="text-xl font-medium text-right text-[#1e2939]">
-                {amountsForPeople[index]}
+                {amountsForPeople[index].toString()}
               </span>
             </p>
           </div>
         ))}
-        DEBUG TOTAL: {getTotal(formObject.watch())}
-        AMOUNTS TOTAL: {amountsForPeople.reduce((a, b) => a + b, 0)}
+        DEBUG TOTAL: {getTotal(formObject.watch()).toString()}
       </div>
       <Button className="w-full mt-6" onClick={() => {}}>
         <svg

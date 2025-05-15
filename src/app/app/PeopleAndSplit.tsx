@@ -188,7 +188,9 @@ export const PeopleAndSplit = ({
                   </div>
                   <div className="text-base font-medium text-right">
                     <span className="text-[#6a7282]">$</span>
-                    <span className="text-[#1e2939]">{product.price}</span>
+                    <span className="text-[#1e2939]">
+                      {product.price.toDecimalPlaces(2).toString()}
+                    </span>
                   </div>
                 </div>
               </div>
