@@ -174,6 +174,9 @@ export const PeopleAndSplit = ({
                               const isAssigned = currentAssigned.includes(
                                 person.id
                               );
+                              if (!isAssigned) {
+                                formObject.setValue("splitEvenly", false);
+                              }
                               // If the person is already assigned, remove them from the assignedTo array
                               // Otherwise, add them to the assignedTo array
                               const newAssigned = isAssigned

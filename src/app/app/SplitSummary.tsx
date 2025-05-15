@@ -5,6 +5,7 @@ import { BillForm } from "./types";
 import Link from "next/link";
 import { useMemo } from "react";
 import { getTotal } from "./utils";
+import Decimal from "decimal.js";
 
 export const SplitSummary = ({
   goBack,
@@ -49,11 +50,52 @@ export const SplitSummary = ({
       });
     }
 
-    // here we handle the case where we don't split evenly products
-    // we need to calculate the amount for each person based on the amount they assigned to each product
-    // and then we split equally tax and tip
-    // TODO
-    return [];
+    // Calculate each person's share of items they're assigned to
+    const itemTotals = new Array(people.length).fill(new Decimal(0));
+    const billItems = formObject.watch().billItems || [];
+
+    billItems.forEach((item) => {
+      const assignedPeople = item.assignedTo || [];
+      if (assignedPeople.length > 0) {
+        // Split item price equally among assigned people
+        const pricePerPerson = item.price
+          .dividedBy(assignedPeople.length)
+          .toDecimalPlaces(2);
+        const remainder = item.price.minus(
+          pricePerPerson.times(assignedPeople.length)
+        );
+
+        assignedPeople.forEach((personId, index) => {
+          const personIndex = people.findIndex((p) => p.id === personId);
+          if (personIndex !== -1) {
+            // Add remainder to first person's share
+            itemTotals[personIndex] = itemTotals[personIndex].plus(
+              index === 0 ? pricePerPerson.plus(remainder) : pricePerPerson
+            );
+          }
+        });
+      }
+    });
+
+    // Split tax and tip evenly
+    const tax = formObject.watch().tax || new Decimal(0);
+    const tip = formObject.watch().tip || new Decimal(0);
+    const extraCharges = tax.plus(tip);
+    const extraChargesPerPerson = extraCharges
+      .dividedBy(people.length)
+      .toDecimalPlaces(2);
+    const extraChargesRemainder = extraCharges.minus(
+      extraChargesPerPerson.times(people.length)
+    );
+
+    // Return final amounts with tax and tip included
+    return itemTotals.map((amount, index) => {
+      return amount.plus(
+        index === 0
+          ? extraChargesPerPerson.plus(extraChargesRemainder)
+          : extraChargesPerPerson
+      );
+    });
   }, [formObject.watch()]);
 
   return (
