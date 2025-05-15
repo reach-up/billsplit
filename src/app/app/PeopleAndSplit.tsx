@@ -63,12 +63,36 @@ export const PeopleAndSplit = ({
 
   const isDisabled = useMemo(() => {
     const people = formObject.watch("people") || [];
-    return people.length === 0 || people.some((field) => field.name === "");
-  }, [formObject.watch("people")]);
+    const products = formObject.watch("billItems") || [];
+    const splitEvenly = formObject.watch("splitEvenly");
+
+    if (people.length === 0 || people.some((field) => field.name === "")) {
+      return true;
+    }
+
+    if (splitEvenly) {
+      return false;
+    }
+
+    return products.some((product) => !product.assignedTo?.length);
+  }, [
+    formObject.watch("people"),
+    formObject.watch("billItems"),
+    formObject.watch("splitEvenly"),
+  ]);
 
   const splitEvenly = formObject.watch("splitEvenly");
 
   const handleSplitEvenlyToggle = () => {
+    if (splitEvenly) {
+      formObject.setValue(
+        "billItems",
+        products.map((product) => ({
+          ...product,
+          assignedTo: [],
+        }))
+      );
+    }
     formObject.setValue("splitEvenly", !splitEvenly);
   };
   return (
@@ -139,8 +163,21 @@ export const PeopleAndSplit = ({
                         return (
                           <TinyButton
                             key={person.id}
-                            isActive={false}
-                            onClick={() => {}}
+                            isActive={product.assignedTo?.includes(person.id)}
+                            onClick={() => {
+                              const currentAssigned = product.assignedTo || [];
+                              const newAssigned = currentAssigned.includes(
+                                person.id
+                              )
+                                ? currentAssigned.filter(
+                                    (id) => id !== person.id
+                                  )
+                                : [...currentAssigned, person.id];
+                              formObject.setValue(
+                                `billItems.${index}.assignedTo`,
+                                newAssigned
+                              );
+                            }}
                             className="rounded-lg"
                           >
                             {personName}

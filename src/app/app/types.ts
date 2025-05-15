@@ -5,6 +5,7 @@ type People = {
 type BillItem = {
   name: string;
   price: number;
+  assignedTo?: string[];
 };
 
 export type BillForm = {

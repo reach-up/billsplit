@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { BillForm } from "./types";
 import Link from "next/link";
+import { useMemo } from "react";
+import { getTotal } from "./utils";
 
 export const SplitSummary = ({
   goBack,
@@ -16,6 +18,33 @@ export const SplitSummary = ({
     name: "people",
   });
 
+  const amountsForPeople = useMemo(() => {
+    const total = getTotal(formObject.watch());
+    const people = formObject.watch().people || [];
+
+    const amountOfPeople = people.length;
+    // if we have 1 person, we want to give the total to them
+    if (amountOfPeople === 1) {
+      return [total];
+    }
+
+    // if we have 3 people, we want to split the total by 3 but the number is 7 we need to give to one person and extra cent to make it even, we determine this based on if total is perfectly dividable to the amount of people
+    // if total is not perfectly dividable to the amount of people, we want to give the extra cent to the first person
+
+    const isDividable = total % amountOfPeople === 0;
+
+    const amountForEachPerson = Number((total / amountOfPeople).toFixed(2));
+
+    return people.map((person, index) => {
+      const amount = isDividable
+        ? amountForEachPerson
+        : index === 0
+        ? amountForEachPerson + 0.01
+        : amountForEachPerson;
+      return amount;
+    });
+  }, [formObject.watch()]);
+
   return (
     <>
       <SubPageHeader
@@ -24,7 +53,7 @@ export const SplitSummary = ({
         onBack={() => goBack()}
       />
       <div className="flex flex-col gap-3 w-full">
-        {fields.map((field) => (
+        {fields.map((field, index) => (
           <div
             className="h-[47px] relative rounded-lg bg-white border border-gray-200 w-full flex flex-row justify-between items-center p-4"
             key={field.id}
@@ -40,11 +69,13 @@ export const SplitSummary = ({
                 {" "}
               </span>
               <span className="text-xl font-medium text-right text-[#1e2939]">
-                14.99
+                {amountsForPeople[index]}
               </span>
             </p>
           </div>
         ))}
+        DEBUG TOTAL: {getTotal(formObject.watch())}
+        AMOUNTS TOTAL: {amountsForPeople.reduce((a, b) => a + b, 0)}
       </div>
       <Button className="w-full mt-6" onClick={() => {}}>
         <svg

@@ -5,6 +5,7 @@ import { BillForm } from "./types";
 import { InputPrice } from "./InputPrice";
 import { useMemo } from "react";
 import { InputText } from "./InputText";
+import { getTotal } from "./utils";
 
 export const ReceiptItems = ({
   goBack,
@@ -25,15 +26,7 @@ export const ReceiptItems = ({
   };
 
   const total = useMemo(() => {
-    let total = 0;
-    // sum all bill items + tip + tax
-    const billItems = formObject.watch()?.billItems || [];
-    billItems.forEach((item) => {
-      total += Number(item.price) || 0;
-    });
-    const tip = Number(formObject.watch("tip")) || 0;
-    const tax = Number(formObject.watch("tax")) || 0;
-    return total + tip + tax;
+    return getTotal(formObject.watch());
   }, [formObject.watch()]);
 
   const isDisabled = useMemo(() => {
