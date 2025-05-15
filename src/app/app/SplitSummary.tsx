@@ -23,7 +23,7 @@ export const SplitSummary = ({
     return formObject.watch().splitEvenly;
   }, [formObject.watch()]);
 
-  const amountsForPeopleEvenly = useMemo(() => {
+  const amountsForPeople = useMemo(() => {
     const total = getTotal(formObject.watch());
     const people = formObject.watch().people || [];
 
@@ -33,20 +33,27 @@ export const SplitSummary = ({
       return [total];
     }
 
-    // if we have 2 people and we need to divide 15.15$ we want to give 7.57 to each person but
-    // the remainder is 0.01 so we want to give 7.58 to the first person
+    if (isEvenly) {
+      // if we have 2 people and we need to divide 15.15$ we want to give 7.57 to each person but
+      // the remainder is 0.01 so we want to give 7.58 to the first person
+      const amountForEachPerson = total
+        .dividedBy(amountOfPeople)
+        .toDecimalPlaces(2);
+      const remainder = total.minus(amountForEachPerson.times(amountOfPeople));
 
-    const amountForEachPerson = total
-      .dividedBy(amountOfPeople)
-      .toDecimalPlaces(2);
-    const remainder = total.minus(amountForEachPerson.times(amountOfPeople));
+      return people.map((_, index) => {
+        // Add any remainder to the first person's amount
+        return index === 0
+          ? amountForEachPerson.plus(remainder)
+          : amountForEachPerson;
+      });
+    }
 
-    return people.map((_, index) => {
-      // Add any remainder to the first person's amount
-      return index === 0
-        ? amountForEachPerson.plus(remainder)
-        : amountForEachPerson;
-    });
+    // here we handle the case where we don't split evenly products
+    // we need to calculate the amount for each person based on the amount they assigned to each product
+    // and then we split equally tax and tip
+    // TODO
+    return [];
   }, [formObject.watch()]);
 
   return (
@@ -73,7 +80,9 @@ export const SplitSummary = ({
                 {" "}
               </span>
               <span className="text-xl font-medium text-right text-[#1e2939]">
-                {isEvenly ? amountsForPeopleEvenly[index].toString() : "TODO"}
+                {amountsForPeople.length > index
+                  ? amountsForPeople[index].toString()
+                  : "TODO"}
               </span>
             </p>
           </div>
