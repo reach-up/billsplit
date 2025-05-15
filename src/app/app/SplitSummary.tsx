@@ -149,6 +149,7 @@ Total: ${total}`;
 
           navigator.clipboard.writeText(formattedString);
 
+          // TODO replace with toast and if on mobile maybe use native share functionality of the browser
           alert("Copied to clipboard!");
         }}
       >
