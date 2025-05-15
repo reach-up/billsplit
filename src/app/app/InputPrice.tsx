@@ -49,29 +49,21 @@ export const InputPrice = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
 
-    // Validate the input format
-    if (!/^-?\d*\.?\d*$/.test(newValue)) {
-      return;
-    }
+    // Allow empty input or valid decimal format with max 2 decimal places
+    if (newValue === "" || /^-?\d*\.?\d{0,2}$/.test(newValue)) {
+      // Don't modify the input while typing
+      setInputValue(newValue);
 
-    // Limit to 2 decimal places
-    const decimalParts = newValue.split(".");
-    if (decimalParts.length > 1 && decimalParts[1].length > 2) {
-      newValue = `${decimalParts[0]}.${decimalParts[1].substring(0, 2)}`;
-    }
+      if (newValue === "" || newValue === ".") {
+        return;
+      }
 
-    setInputValue(newValue);
-
-    if (newValue === "") {
-      onChange?.(new Decimal(0));
-      return;
-    }
-
-    try {
-      const decimalValue = new Decimal(newValue);
-      onChange?.(decimalValue);
-    } catch (error) {
-      console.error("Invalid decimal value:", error);
+      try {
+        const decimalValue = new Decimal(newValue);
+        onChange?.(decimalValue);
+      } catch (error) {
+        console.error("Invalid decimal value:", error);
+      }
     }
   };
 

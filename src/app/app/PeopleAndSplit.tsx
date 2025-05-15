@@ -5,6 +5,7 @@ import { BillForm } from "./types";
 import { InputText } from "./InputText";
 import { useMemo } from "react";
 import { createPersonId } from "./utils";
+import Decimal from "decimal.js";
 
 const TinyButton = ({
   isActive,
@@ -153,10 +154,10 @@ export const PeopleAndSplit = ({
           {products?.map((product, index) => {
             return (
               <div key={product.id} className="w-full max-w-[350px]">
-                <div className="grid grid-cols-[1fr_auto] gap-4 px-4 py-3 rounded-lg bg-[#F7F5F5] border border-[#d1d5dc]">
+                <div className="grid grid-cols-[1fr_auto] px-4 py-3 rounded-lg bg-[#F7F5F5] border border-[#d1d5dc]">
                   <div className="space-y-3">
                     <p className="text-base text-[#1e2939]">{product.name}</p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {people.map((person, index) => {
                         const personName = formObject.watch(
                           `people.${index}.name`
@@ -195,8 +196,13 @@ export const PeopleAndSplit = ({
                   </div>
                   <div className="text-base font-medium text-right">
                     <span className="text-[#6a7282]">$</span>
-                    <span className="text-[#1e2939]">
-                      {product.price.toDecimalPlaces(2).toString()}
+                    <span className="text-[#1e2939] whitespace-nowrap">
+                      {(product.price instanceof Decimal
+                        ? product.price
+                        : new Decimal(product.price)
+                      )
+                        .toDecimalPlaces(2)
+                        .toString()}
                     </span>
                   </div>
                 </div>

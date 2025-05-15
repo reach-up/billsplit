@@ -39,6 +39,14 @@ export const ReceiptItems = ({
     );
   }, [formObject.watch("billItems"), total]);
 
+  const tip = useMemo(() => {
+    return formObject.getValues("tip");
+  }, [formObject.getValues("tip")]);
+
+  const tax = useMemo(() => {
+    return formObject.getValues("tax");
+  }, [formObject.getValues("tax")]);
+
   return (
     <>
       <SubPageHeader
@@ -84,7 +92,7 @@ export const ReceiptItems = ({
           <div className="flex flex-col gap-2">
             <p className="text-sm text-left text-[#1e2939]">Tip:</p>
             <InputPrice
-              value={formObject.watch("tip")}
+              value={tip}
               onChange={(value) => formObject.setValue("tip", value)}
               className="w-full"
               placeholder="0.00"
@@ -93,7 +101,7 @@ export const ReceiptItems = ({
           <div className="flex flex-col gap-2">
             <p className="text-sm text-left text-[#1e2939]">Tax:</p>
             <InputPrice
-              value={formObject.watch("tax")}
+              value={tax}
               onChange={(value) => formObject.setValue("tax", value)}
               className="w-full"
               placeholder="0.00"
