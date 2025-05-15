@@ -29,10 +29,12 @@ export const SplitSummary = ({
       return [total];
     }
 
-    // if we have 3 people, we want to split the total by 3 but the number is 7 we need to give to one person and extra cent to make it even, we determine this based on if total is perfectly dividable to the amount of people
-    // if total is not perfectly dividable to the amount of people, we want to give the extra cent to the first person
+    // if we have 2 people and we need to divide 15.15$ we want to give 7.57 to each person but
+    // the remainder is 0.01 so we want to give 7.58 to the first person
 
-    const amountForEachPerson = total.dividedBy(amountOfPeople);
+    const amountForEachPerson = total
+      .dividedBy(amountOfPeople)
+      .toDecimalPlaces(2);
     const remainder = total.minus(amountForEachPerson.times(amountOfPeople));
 
     return people.map((_, index) => {
