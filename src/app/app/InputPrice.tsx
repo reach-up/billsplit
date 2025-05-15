@@ -29,7 +29,14 @@ export const InputPrice = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+    let newValue = e.target.value.replace(/,/g, ".");
+
+    // Limit to 2 decimal places
+    const decimalParts = newValue.split(".");
+    if (decimalParts.length > 1 && decimalParts[1].length > 2) {
+      newValue = `${decimalParts[0]}.${decimalParts[1].substring(0, 2)}`;
+    }
+
     setInputValue(newValue);
 
     if (newValue === "") {
@@ -52,7 +59,8 @@ export const InputPrice = ({
     }
 
     try {
-      const decimalValue = new Decimal(inputValue);
+      const normalizedValue = inputValue.replace(/,/g, ".");
+      const decimalValue = new Decimal(normalizedValue);
       onChange?.(decimalValue);
       setInputValue(decimalValue.toString());
     } catch (error) {
@@ -67,7 +75,7 @@ export const InputPrice = ({
     >
       <span className="text-base font-medium text-[#1e2939]">$</span>
       <input
-        type="number"
+        type="string"
         step="0.01"
         min="0"
         inputMode="decimal"
