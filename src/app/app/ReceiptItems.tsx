@@ -27,17 +27,14 @@ export const ReceiptItems = ({
   const total = useMemo(() => {
     let total = 0;
     // sum all bill items + tip + tax
-    formObject.watch("billItems").forEach((item) => {
-      total += item.price;
+    const billItems = formObject.watch()?.billItems || [];
+    billItems.forEach((item) => {
+      total += Number(item.price) || 0;
     });
-    total += Number(formObject.watch("tip") || 0);
-    total += Number(formObject.watch("tax") || 0);
-    return total;
-  }, [
-    formObject.watch("billItems"),
-    formObject.watch("tip"),
-    formObject.watch("tax"),
-  ]);
+    const tip = Number(formObject.watch("tip")) || 0;
+    const tax = Number(formObject.watch("tax")) || 0;
+    return total + tip + tax;
+  }, [formObject.watch()]);
 
   const isDisabled = useMemo(() => {
     const products = formObject.watch("billItems") || [];
