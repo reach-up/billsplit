@@ -24,8 +24,9 @@ export const SplitSummary = ({
     return formObject.watch().splitEvenly;
   }, [formObject.watch()]);
 
+  const total = getTotal(formObject.watch());
+
   const amountsForPeople = useMemo(() => {
-    const total = getTotal(formObject.watch());
     const people = formObject.watch().people || [];
 
     const amountOfPeople = people.length;
@@ -129,9 +130,28 @@ export const SplitSummary = ({
             </p>
           </div>
         ))}
-        DEBUG TOTAL: {getTotal(formObject.watch()).toString()}
       </div>
-      <Button className="w-full mt-6" onClick={() => {}}>
+      <Button
+        className="w-full mt-6"
+        onClick={() => {
+          // copy to clipboard a formatted string with the people and their amounts
+          const people = formObject.watch().people || [];
+          const amounts = amountsForPeople;
+          const formattedString = `
+Here's how we should split this bill:
+${people
+  .map((person, index) => {
+    return `- ${person.name}: $${amounts[index].toString()}`;
+  })
+  .join("\n")}
+  
+Total: ${total}`;
+
+          navigator.clipboard.writeText(formattedString);
+
+          alert("Copied to clipboard!");
+        }}
+      >
         <svg
           width="16"
           height="16"
