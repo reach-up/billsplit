@@ -20,6 +20,7 @@ export const ReceiptItems = ({
   const { fields, append, remove } = useFieldArray({
     control: formObject.control,
     name: "billItems",
+    keyName: "_id",
   });
 
   const handleAddItem = () => {
@@ -58,7 +59,7 @@ export const ReceiptItems = ({
         {fields.map((field, index) => (
           <div
             className="flex justify-start items-center relative gap-2"
-            key={field.id}
+            key={field._id}
           >
             <InputText
               placeholder="Item name"

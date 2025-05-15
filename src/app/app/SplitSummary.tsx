@@ -17,6 +17,7 @@ export const SplitSummary = ({
   const { fields } = useFieldArray({
     control: formObject.control,
     name: "people",
+    keyName: "_id",
   });
 
   const isEvenly = useMemo(() => {
@@ -60,7 +61,7 @@ export const SplitSummary = ({
         {fields.map((field, index) => (
           <div
             className="h-[47px] relative rounded-lg bg-white border border-gray-200 w-full flex flex-row justify-between items-center p-4"
-            key={field.id}
+            key={field._id}
           >
             <p className="text-base font-medium text-left text-[#1e2939]">
               {field.name}

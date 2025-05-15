@@ -52,11 +52,13 @@ export const PeopleAndSplit = ({
   } = useFieldArray({
     control: formObject.control,
     name: "people",
+    keyName: "_id",
   });
 
   const { fields: products, update: updateProduct } = useFieldArray({
     control: formObject.control,
     name: "billItems",
+    keyName: "_id",
   });
 
   const handleAddPerson = () => {
@@ -109,7 +111,7 @@ export const PeopleAndSplit = ({
         {people.map((person, index) => (
           <div
             className="flex justify-start items-center relative gap-2"
-            key={person.id}
+            key={person._id}
           >
             <InputText
               placeholder="Person name"
@@ -165,18 +167,26 @@ export const PeopleAndSplit = ({
                         );
                         return (
                           <TinyButton
-                            key={person.id}
+                            key={person._id}
                             isActive={product.assignedTo?.includes(person.id)}
                             onClick={() => {
                               const currentAssigned = product.assignedTo || [];
-                              const newAssigned = currentAssigned.includes(
+                              const isAssigned = currentAssigned.includes(
                                 person.id
-                              )
+                              );
+                              // If the person is already assigned, remove them from the assignedTo array
+                              // Otherwise, add them to the assignedTo array
+                              const newAssigned = isAssigned
                                 ? currentAssigned.filter(
                                     (id) => id !== person.id
                                   )
                                 : [...currentAssigned, person.id];
 
+                              console.log(
+                                "isAssigned",
+                                isAssigned,
+                                newAssigned
+                              );
                               updateProduct(productIndex, {
                                 ...product,
                                 assignedTo: newAssigned,
