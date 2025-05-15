@@ -133,6 +133,9 @@ export const PeopleAndSplit = ({
                     <p className="text-base text-[#1e2939]">{product.name}</p>
                     <div className="flex flex-wrap gap-2">
                       {people.map((person, index) => {
+                        const personName = formObject.watch(
+                          `people.${index}.name`
+                        );
                         return (
                           <TinyButton
                             key={person.id}
@@ -140,7 +143,7 @@ export const PeopleAndSplit = ({
                             onClick={() => {}}
                             className="rounded-lg"
                           >
-                            {person.name}
+                            {personName}
                           </TinyButton>
                         );
                       })}
