@@ -178,6 +178,25 @@ export const UploadOrManualBill = ({
                     alt="Receipt preview"
                     className="w-full h-full object-contain p-4"
                   />
+                  {isLoading && (
+                    <div className="absolute inset-0 bg-black/10">
+                      <div className="absolute inset-x-0 h-1 bg-orange-500/50 animate-scan-line" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="bg-white/90 px-4 py-2 rounded-lg flex items-center gap-2">
+                          <div className="animate-spin h-4 w-4 border-2 border-orange-500 border-t-transparent rounded-full" />
+                          <span className="text-sm font-medium animate-pulse">
+                            {
+                              [
+                                "Looking at receipt...",
+                                "Transcribing items...",
+                                "Checking tax and tips...",
+                              ][Math.floor((Date.now() / 2000) % 3)]
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {!isLoading && (
                     <button
                       onClick={(e) => {
@@ -231,11 +250,16 @@ export const UploadOrManualBill = ({
         )}
       </Dropzone>
       <Button
-        className="w-full mt-6"
+        className="w-full mt-6 min-h-[46px]"
         onClick={processBill}
         disabled={isDisabled || isLoading}
       >
-        <span>{isLoading ? "Processing..." : "Scrape the Bill"}</span>
+        <span className="flex items-center justify-center gap-2">
+          {isLoading && (
+            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+          )}
+          {!isLoading && <span>Scrape the Bill</span>}
+        </span>
       </Button>
     </>
   );

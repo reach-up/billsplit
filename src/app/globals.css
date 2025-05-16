@@ -1,7 +1,18 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@keyframes scan {
+  from {
+    top: 0;
+  }
+  to {
+    top: 100%;
+  }
+}
+
+.animate-scan-line {
+  animation: scan 2s linear infinite;
+}
 
 @theme inline {
   --color-background: var(--background);

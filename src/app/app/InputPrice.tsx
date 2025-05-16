@@ -58,7 +58,7 @@ export const InputPrice = ({
       } catch (error) {
         console.error("Invalid decimal value:", error);
       }
-    }, 500),
+    }, 800),
     [onChange]
   );
 
