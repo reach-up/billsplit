@@ -51,13 +51,19 @@ const systemPrompt = dedent`
   IMPORTANT: Extract ONLY the information visible in the receipt. Do not make assumptions about missing data.
 `;
 
-export async function scrapeBill(billUrl: string): Promise<ExtractSchemaType> {
+export async function scrapeBill({
+  billUrl,
+  model = "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+}: {
+  billUrl: string;
+  model?: string;
+}): Promise<ExtractSchemaType> {
   const jsonSchema = zodToJsonSchema(extractSchema, {
     target: "openAi",
   });
 
   const extract = await togetherBaseClient.chat.completions.create({
-    model: "Qwen/Qwen2-VL-72B-Instruct",
+    model: model,
     messages: [
       {
         role: "user",
