@@ -41,12 +41,12 @@ export const ReceiptItems = ({
   }, [formObject.watch("billItems"), total]);
 
   const tip = useMemo(() => {
-    return formObject.getValues("tip");
-  }, [formObject.getValues("tip")]);
+    return formObject.watch("tip");
+  }, [formObject.watch("tip")]);
 
   const tax = useMemo(() => {
-    return formObject.getValues("tax");
-  }, [formObject.getValues("tax")]);
+    return formObject.watch("tax");
+  }, [formObject.watch("tax")]);
 
   return (
     <>

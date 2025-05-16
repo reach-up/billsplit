@@ -1,5 +1,6 @@
-import { InputHTMLAttributes, useState, useEffect } from "react";
+import { InputHTMLAttributes, useState, useEffect, useCallback } from "react";
 import Decimal from "decimal.js";
+import { debounce } from "lodash";
 
 type InputPriceProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -46,24 +47,28 @@ export const InputPrice = ({
     }
   };
 
+  const debouncedOnChange = useCallback(
+    debounce((value: string) => {
+      if (value === "" || value === ".") {
+        return;
+      }
+      try {
+        const decimalValue = new Decimal(value);
+        onChange?.(decimalValue);
+      } catch (error) {
+        console.error("Invalid decimal value:", error);
+      }
+    }, 500),
+    [onChange]
+  );
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
 
     // Allow empty input or valid decimal format with max 2 decimal places
     if (newValue === "" || /^-?\d*\.?\d{0,2}$/.test(newValue)) {
-      // Don't modify the input while typing
       setInputValue(newValue);
-
-      if (newValue === "" || newValue === ".") {
-        return;
-      }
-
-      try {
-        const decimalValue = new Decimal(newValue);
-        onChange?.(decimalValue);
-      } catch (error) {
-        console.error("Invalid decimal value:", error);
-      }
+      debouncedOnChange(newValue);
     }
   };
 
