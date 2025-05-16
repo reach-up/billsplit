@@ -99,7 +99,6 @@ const visionModels = [
   "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
   "meta-llama/Llama-4-Scout-17B-16E-Instruct",
   "Qwen/Qwen2-VL-72B-Instruct",
-  "Qwen/Qwen2.5-VL-72B-Instruct",
 ];
 
 visionModels.map((model) => {
