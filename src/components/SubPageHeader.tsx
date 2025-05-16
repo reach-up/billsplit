@@ -8,7 +8,7 @@ export default function SubPageHeader({
   onBack?: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 pb-6">
+    <div className="flex flex-col gap-3">
       <div
         onClick={() => {
           onBack?.();

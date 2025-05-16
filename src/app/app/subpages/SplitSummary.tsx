@@ -125,7 +125,7 @@ export const SplitSummary = ({
               <span className="text-xl font-medium text-right text-[#1e2939]">
                 {amountsForPeople.length > index
                   ? amountsForPeople[index].toString()
-                  : "TODO"}
+                  : "-"}
               </span>
             </p>
           </div>

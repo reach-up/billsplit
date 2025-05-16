@@ -22,7 +22,12 @@ export default function AppPage() {
     parseAsStringLiteral(viewOptions)
   );
 
-  const formObject = useForm<BillForm>();
+  const formObject = useForm<BillForm>({
+    defaultValues: {
+      billItems: [],
+      people: [],
+    },
+  });
 
   const { watch, setValue } = formObject;
 
