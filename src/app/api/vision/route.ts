@@ -3,8 +3,9 @@ import { z } from "zod";
 import { togetherBaseClient } from "./clients";
 import zodToJsonSchema from "zod-to-json-schema";
 
-export async function POST(req: Request) {
-  const { text, language } = await req.json();
+export async function GET(req: Request) {
+  const billUrl = "https://asprise.com/ocr/api/img/blog/rcpt/US-1.jpg";
+  // const { billUrl } = await req.json();
 
   const start = new Date();
 
@@ -20,7 +21,8 @@ export async function POST(req: Request) {
     - Identify the restaurant/business name and location
     - Find the receipt date
     - Extract each item with its name and total price
-    - Capture additional charges (tax, tip)
+    - Capture tax amount, if applicable and not percentage but the money amount
+    - Identify any tips or gratuities, if multiple tips are shown just output the medium one
     - Ensure all numerical values are accurate
     - Convert all prices to decimal numbers
     
@@ -28,7 +30,9 @@ export async function POST(req: Request) {
   `;
 
   const extractSchema = z.object({
-    restaurantName: z.string().describe("Name of the restaurant or business"),
+    businessName: z
+      .string()
+      .describe("Name of the business where the bill was created"),
     date: z.string().describe("Date when the bill was created"),
     billItems: z
       .array(
@@ -38,12 +42,16 @@ export async function POST(req: Request) {
         })
       )
       .describe("List of items in the bill"),
-    subTotal: z
+    tax: z
       .number()
       .optional()
-      .describe("Subtotal amount before tax and tip"),
-    tax: z.number().optional().describe("Tax amount"),
-    tip: z.number().optional().describe("Tip amount"),
+      .describe("Tax amount, not percentage we need money amount"),
+    tip: z
+      .number()
+      .optional()
+      .describe(
+        "Tip amount, not percentage we need money amount and if multiple tips are shown just output the medium one"
+      ),
   });
 
   const jsonSchema = zodToJsonSchema(extractSchema, {
@@ -51,7 +59,7 @@ export async function POST(req: Request) {
   });
 
   const extract = await togetherBaseClient.chat.completions.create({
-    model: "arcee_ai/arcee-spotlight",
+    model: "Qwen/Qwen2-VL-72B-Instruct",
     messages: [
       {
         role: "user",
@@ -60,7 +68,7 @@ export async function POST(req: Request) {
           {
             type: "image_url",
             image_url: {
-              url: "",
+              url: billUrl,
             },
           },
         ],
@@ -77,9 +85,8 @@ export async function POST(req: Request) {
 
   if (extract?.choices?.[0]?.message?.content) {
     const output = JSON.parse(extract?.choices?.[0]?.message?.content);
-    return output as typeof extractSchema._output;
+    // return output as typeof extractSchema._output;
+    return Response.json(output);
   }
   throw new Error("No content returned from Llama 4 vision");
 }
-
-export const runtime = "edge";

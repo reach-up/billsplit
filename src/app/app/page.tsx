@@ -105,7 +105,7 @@ export default function AppPage() {
               id="restaurant-name"
               placeholder="e.g. Olive Garden"
               className="w-full px-3 py-2.5 rounded-lg border border-[#d1d5dc] bg-white focus:outline-none focus:ring-2 focus:ring-[#d04f17] focus:border-transparent"
-              {...register("restaurantName")}
+              {...register("businessName")}
             />
           </div>
           <div>

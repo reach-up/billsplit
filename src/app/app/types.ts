@@ -13,7 +13,7 @@ type BillItem = {
 };
 
 export type BillForm = {
-  restaurantName?: string;
+  businessName?: string;
   date?: Date;
   billItems: BillItem[];
   subTotal?: Decimal;
