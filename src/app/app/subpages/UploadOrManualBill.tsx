@@ -23,6 +23,7 @@ export const UploadOrManualBill = ({
   formObject: UseFormReturn<BillForm>;
 }) => {
   const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { uploadToS3 } = useS3Upload();
   const { register, watch } = formObject;
 
@@ -32,11 +33,12 @@ export const UploadOrManualBill = ({
 
   const processBill = async () => {
     if (!file) return;
-    const uploadedBill = await uploadToS3(file);
-
-    uploadedBill.url;
-
+    setIsLoading(true);
     try {
+      const uploadedBill = await uploadToS3(file);
+
+      uploadedBill.url;
+
       const response = await fetch("/api/vision", {
         method: "POST",
         body: JSON.stringify({
@@ -67,6 +69,9 @@ export const UploadOrManualBill = ({
       goForward();
     } catch (e) {
       // toast error couldn't process bill visually
+      console.error("Error processing bill:", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -177,9 +182,9 @@ export const UploadOrManualBill = ({
       <Button
         className="w-full mt-6"
         onClick={processBill}
-        disabled={isDisabled}
+        disabled={isDisabled || isLoading}
       >
-        <span>Scrape the Bill</span>
+        <span>{isLoading ? "Processing..." : "Scrape the Bill"}</span>
       </Button>
     </>
   );
