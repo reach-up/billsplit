@@ -5,7 +5,7 @@ import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
 import { BillForm } from "../types";
 import Dropzone from "react-dropzone";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useS3Upload } from "next-s3-upload";
 import { ExtractSchemaType } from "@/app/api/vision/scrapeBill";
 import { createId } from "../utils";
@@ -26,6 +26,19 @@ export const UploadOrManualBill = ({
   const [isLoading, setIsLoading] = useState(false);
   const { uploadToS3 } = useS3Upload();
   const { register, watch } = formObject;
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isLoading) {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isLoading]);
 
   const isDisabled = useMemo(() => {
     return !file;
@@ -138,6 +151,7 @@ export const UploadOrManualBill = ({
           "image/*": [".jpg", ".jpeg", ".png"],
         }}
         onDrop={(acceptedFiles) => {
+          if (isLoading) return;
           const file = acceptedFiles[0];
           if (file.size > 15 * 1024 * 1024) {
             // 10MB in bytes
@@ -150,31 +164,68 @@ export const UploadOrManualBill = ({
           setFile(file);
         }}
       >
-        {({ getRootProps, getInputProps, isDragAccept }) => (
+        {({ getRootProps, getInputProps }) => (
           <div
             className="flex flex-col justify-start items-start max-w-[350px] w-full max-h-[479px] h-full relative overflow-hidden gap-2.5 p-4 rounded-2xl bg-[#faf7f5] border border-gray-200"
             style={{ boxShadow: "0px 1px 6px -4px rgba(0,0,0,0.2)" }}
             {...getRootProps()}
           >
             <div className="h-[447px] w-full relative overflow-hidden rounded-xl bg-[#f6f0ed] border border-[#d1d5dc] border-dashed flex justify-center items-center">
-              <div className="flex flex-col gap-3">
-                <img className="w-[131px] h-[72px]" src="/camera.png" />
-                <div className="flex flex-col">
-                  <p className=" ext-base font-medium text-center text-[#364153]">
-                    Take a photo
-                  </p>
-                  <input required={!file} {...getInputProps()} />
-                  <Link
-                    href="/app?mode=manual"
-                    onClick={(evt) => {
-                      evt.stopPropagation();
-                    }}
-                    className="text-xs text-center underline text-[#4a5565]"
-                  >
-                    or upload receipt
-                  </Link>
+              {file ? (
+                <div className="w-full h-full relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Receipt preview"
+                    className="w-full h-full object-contain p-4"
+                  />
+                  {!isLoading && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFile(null);
+                      }}
+                      className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white/90 transition-colors"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M18 6L6 18" />
+                        <path d="M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <img
+                    className="w-[131px] h-[72px]"
+                    src="/camera.png"
+                    alt="Camera icon"
+                  />
+                  <div className="flex flex-col">
+                    <p className="text-base font-medium text-center text-[#364153]">
+                      Take a photo
+                    </p>
+                    <input required={!file} {...getInputProps()} />
+                    <Link
+                      href="/app?mode=manual"
+                      onClick={(evt) => {
+                        evt.stopPropagation();
+                      }}
+                      className="text-xs text-center underline text-[#4a5565]"
+                    >
+                      or upload receipt
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
