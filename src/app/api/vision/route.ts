@@ -1,8 +1,7 @@
 import { scrapeBill } from "./scrapeBill";
 
-export async function GET(req: Request) {
-  const billUrl = "https://asprise.com/ocr/api/img/blog/rcpt/US-1.jpg";
-  // const { billUrl } = await req.json();
+export async function POST(req: Request) {
+  const { billUrl } = await req.json();
 
   const start = new Date();
   const output = await scrapeBill({

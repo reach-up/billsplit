@@ -1,10 +1,10 @@
 import SubPageHeader from "@/components/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
-import { BillForm } from "./types";
+import { BillForm } from "../types";
 import Link from "next/link";
 import { useMemo } from "react";
-import { getTotal } from "./utils";
+import { getTotal } from "../utils";
 import Decimal from "decimal.js";
 
 export const SplitSummary = ({

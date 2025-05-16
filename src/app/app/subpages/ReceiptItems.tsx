@@ -1,11 +1,11 @@
 import SubPageHeader from "@/components/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
-import { BillForm } from "./types";
-import { InputPrice } from "./InputPrice";
+import { BillForm } from "../types";
+import { InputPrice } from "../InputPrice";
 import { useMemo } from "react";
-import { InputText } from "./InputText";
-import { createId, getTotal } from "./utils";
+import { InputText } from "../InputText";
+import { createId, getTotal } from "../utils";
 import Decimal from "decimal.js";
 
 export const ReceiptItems = ({

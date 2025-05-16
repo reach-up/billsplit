@@ -1,11 +1,10 @@
 import SubPageHeader from "@/components/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
-import { BillForm } from "./types";
-import { InputText } from "./InputText";
+import { BillForm } from "../types";
+import { InputText } from "../InputText";
 import { useMemo } from "react";
-import { createId } from "./utils";
-import Decimal from "decimal.js";
+import { createId } from "../utils";
 
 const TinyButton = ({
   isActive,
