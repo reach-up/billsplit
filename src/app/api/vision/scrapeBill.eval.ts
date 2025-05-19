@@ -8,13 +8,13 @@ const testData = [
     input: "https://asprise.com/ocr/api/img/blog/rcpt/US-1.jpg",
     expected: {
       businessName: "Walmart",
-      date: "11/29/2013",
+      date: "2013-11-29",
       billItems: [
         { name: "3DSXL BUNDLE", price: 149.99 },
         { name: "3DSXL BUNDLE", price: 149.99 },
       ],
       tax: 24,
-      tip: 0,
+      tip: null,
     },
   },
   {
@@ -23,7 +23,7 @@ const testData = [
       "https://i0.wp.com/escapearoundtheworld.com/wp-content/uploads/2020/03/IMG_6147-1.jpg?resize=610%2C1024&ssl=1",
     expected: {
       businessName: "NOBU - Restaurant",
-      date: "2/13/2020",
+      date: "2020-02-13",
       billItems: [
         { name: "Peruvian Caipiri", price: 18 },
         { name: "Hakka Nigori", price: 18 },
@@ -40,7 +40,7 @@ const testData = [
       "https://media-cdn.tripadvisor.com/media/photo-s/0c/11/46/20/bubba-gump-shrimp-co.jpg",
     expected: {
       businessName: "Bubba Gump Shrimp Co",
-      date: "07/18/2016",
+      date: "2016-07-18",
       billItems: [
         { name: "Diet Pepsi", price: 2.79 },
         { name: "Lemonade", price: 2.79 },
@@ -70,7 +70,7 @@ const testData = [
         { name: "MELE GRANNY SMITH", price: 1.53 },
       ],
       tax: 1.12,
-      tip: 0,
+      tip: null,
     },
   },
   {
@@ -79,7 +79,7 @@ const testData = [
       "https://media-cdn.tripadvisor.com/media/photo-s/12/99/2b/3b/receipt.jpg",
     expected: {
       businessName: "Mertcan",
-      date: "28/03/2018",
+      date: "2018-03-28",
       billItems: [
         { name: "Fresh Lavash Wrap", price: 39 },
         { name: "Urfa Kebab", price: 54 },
@@ -91,6 +91,46 @@ const testData = [
       ],
       tax: 16.35,
       tip: null,
+    },
+  },
+  {
+    name: "Tatiana New York Receipt",
+    input:
+      "https://reportergourmet.com/upload/multimedia/Tatiana-scontrino.jpg",
+    expected: {
+      businessName: "Lincoln Center",
+      date: "2024-06-18",
+      billItems: [
+        { name: "Spicy Marg", price: 18 },
+        { name: "Tatiana Tonic", price: 18 },
+        { name: "Egusi Dumpling", price: 22 },
+        { name: "Crispy Okra", price: 16 },
+        { name: "Curried Goat Patties", price: 27 },
+        { name: "Braised Oxtails", price: 58 },
+        { name: "Malbec, Solar del Alma, Natural, Mendoza", price: 59 },
+        { name: "Black Bean Hummus", price: 26 },
+        { name: "Rice & Peas", price: 12 },
+        { name: "Rum Cake", price: 18 },
+      ],
+      tax: 24.33,
+      tip: null,
+    },
+  },
+  {
+    name: "El Chalan Restaurant Receipt",
+    input:
+      "https://c8.alamy.com/comp/FWREE7/miami-floridael-chalan-restaurant-peruvian-foodcheck-receipt-bill-FWREE7.jpg",
+    expected: {
+      businessName: "El Chalan Restaurant",
+      date: "2016-12-03",
+      billItems: [
+        { name: "CAUSA DE POLLO", price: 8.95 },
+        { name: "CEVICHE DE CAMARONES", price: 16.95 },
+        { name: "LIMONADA", price: 4 },
+        { name: "PESCADO AL AJILLO", price: 15.95 },
+      ],
+      tax: 3.67,
+      tip: 9.9,
     },
   },
 ];

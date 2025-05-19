@@ -41,10 +41,10 @@ const systemPrompt = dedent`
 
   Guidelines for extraction:
   - Identify the restaurant/business name and location if available otherwise just return null
-  - Find the receipt date or return null, date format should be mm/dd/yyyy
+  - Find the receipt date or return null, date format should be YYYY-MM-DD but if day it's less than 10 don't add a 0 in front
   - Extract each item with its name and total price
-  - Capture tax amount, if applicable and not percentage but the money amount
-  - Identify any tips or gratuities, if multiple tips are shown just output the medium one
+  - Capture tax amount, if applicable and not percentage but the money amount otherwise return null
+  - Identify any tips or gratuities, if multiple tips are shown just output the medium one otherwise return null
   - Ensure all numerical values are accurate
   - Convert all prices to decimal numbers
   
