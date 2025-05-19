@@ -103,8 +103,12 @@ export const SplitSummary = ({
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    // Initialize confetti only on client side
-    setShowConfetti(true);
+    // Check if confetti has been shown in this session
+    const hasShownConfetti = sessionStorage.getItem("hasShownConfetti");
+    if (!hasShownConfetti) {
+      setShowConfetti(true);
+      sessionStorage.setItem("hasShownConfetti", "true");
+    }
   }, []);
 
   return (
