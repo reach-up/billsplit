@@ -79,6 +79,8 @@ export const UploadOrManualBill = ({
           };
         })
       );
+      formObject.setValue("tax", new Decimal(extractedData?.tax || 0));
+      formObject.setValue("tip", new Decimal(extractedData?.tip || 0));
 
       goForward();
     } catch (e) {
@@ -234,15 +236,9 @@ export const UploadOrManualBill = ({
                       Take a photo
                     </p>
                     <input required={!file} {...getInputProps()} />
-                    <Link
-                      href="/app?mode=manual"
-                      onClick={(evt) => {
-                        evt.stopPropagation();
-                      }}
-                      className="text-xs text-center underline text-[#4a5565]"
-                    >
+                    <div className="text-xs text-center underline text-[#4a5565]">
                       or upload receipt
-                    </Link>
+                    </div>
                   </div>
                 </div>
               )}
