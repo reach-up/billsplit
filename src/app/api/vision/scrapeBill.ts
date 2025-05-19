@@ -25,7 +25,7 @@ export const extractSchema = z.object({
     .number()
     .optional()
     .describe(
-      "Tip amount, not percentage we need money amount and if multiple tips are shown just output the medium one"
+      "Tip or Gratuity amount, not percentage we need money amount and if multiple tips are shown just output the medium one"
     ),
 });
 
