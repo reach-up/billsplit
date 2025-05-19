@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { BillForm } from "../types";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getTotal } from "../utils";
 import Decimal from "decimal.js";
+import Confetti from "react-confetti-boom";
 
 export const SplitSummary = ({
   goBack,
@@ -99,8 +100,30 @@ export const SplitSummary = ({
     });
   }, [formObject.watch()]);
 
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    // Initialize confetti only on client side
+    setShowConfetti(true);
+  }, []);
+
   return (
     <>
+      {showConfetti && (
+        <Confetti
+          mode="boom"
+          x={0.5}
+          y={0.5}
+          particleCount={600}
+          deg={270}
+          shapeSize={8}
+          spreadDeg={180}
+          effectInterval={3000}
+          effectCount={1}
+          colors={["#6a2000", "#d04f17", "#f4eeec"]}
+          launchSpeed={1.5}
+        />
+      )}
       <SubPageHeader
         title="Split Summary"
         description="Here is how you should split this bill:"
