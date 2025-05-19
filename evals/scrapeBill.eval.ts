@@ -1,6 +1,6 @@
 import { evalite } from "evalite";
 import { Levenshtein } from "autoevals";
-import { scrapeBill } from "./scrapeBill";
+import { scrapeBill } from "../src/lib/scrapeBill";
 import { billEvals } from "./billsEvals";
 
 const visionModels = [

@@ -1,4 +1,4 @@
-import { scrapeBill } from "./scrapeBill";
+import { scrapeBill } from "../../../lib/scrapeBill";
 
 export async function POST(req: Request) {
   const { billUrl } = await req.json();

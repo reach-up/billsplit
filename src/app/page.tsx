@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "BillSplit",
   description:
     "Scan. Tap. Split. Snap the receipt, tap your items, see who owes what. No sign-ups, no math, no drama.",
+  openGraph: {
+    images: "https://usebillsplit.com/og.png",
+  },
 };
 
 export default function Home() {
