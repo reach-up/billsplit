@@ -8,7 +8,7 @@ if (process.env.HELICONE_API_KEY) {
   options.baseURL = "https://together.helicone.ai/v1";
   options.defaultHeaders = {
     "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-    "Helicone-Property-Appname": "ratemyroom",
+    "Helicone-Property-Appname": "billsplit",
   };
 }
 
