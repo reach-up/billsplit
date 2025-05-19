@@ -47,6 +47,7 @@ export const UploadOrManualBill = ({
   const processBill = async () => {
     if (!file) return;
     setIsLoading(true);
+    localStorage.removeItem("billFormData");
     try {
       const uploadedBill = await uploadToS3(file);
 
