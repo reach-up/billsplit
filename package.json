@@ -26,6 +26,7 @@
     "lucide-react": "^0.508.0",
     "nanoid": "^5.1.5",
     "next": "15.3.2",
+    "next-plausible": "^3.12.4",
     "next-s3-upload": "^0.3.4",
     "nuqs": "^2.4.3",
     "react": "^19.0.0",
