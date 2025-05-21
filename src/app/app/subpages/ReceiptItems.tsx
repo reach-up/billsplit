@@ -109,14 +109,12 @@ export const ReceiptItems = ({
             />
           </div>
         </div>
-        <div className="flex flex-row gap-2 items-center justify-end">
+        <div className="flex flex-row gap-2 items-end justify-end">
           <p className="text-sm text-right text-[#1e2939]">
             Total: <span className="font-medium text-[#6a7282]">$ </span>
           </p>
-          <p className="font-medium text-right">
-            <span className="text-2xl font-medium text-right text-[#1e2939]">
-              {total.toFixed(2)}
-            </span>
+          <p className="text-2xl font-medium text-right text-[#1e2939] -mb-0.5">
+            {total.toFixed(2)}
           </p>
         </div>
       </div>

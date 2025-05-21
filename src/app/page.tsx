@@ -23,7 +23,7 @@ export default function Home() {
           />
 
           <div className="mb-12">
-            <h1 className="text-3xl sm:text-4xl font-medium text-[#1e2939] mb-2">
+            <h1 className="text-4xl md:text-5xl font-medium text-[#1e2939] mb-2">
               Scan. Tap. Split.
             </h1>
             <p className="text-sm sm:text-base text-[#4a5565] max-w-xs sm:max-w-sm">
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full max-w-xs sm:max-w-sm flex flex-col gap-4">
+        <div className="w-full max-w-xs sm:max-w-sm flex flex-col gap-3">
           <Link href="/app?mode=camera">
             <Button className="w-full">
               <img src="/camera.svg" className="w-4 h-4" />

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="w-full flex justify-between items-center py-3 px-2 border-b border-[#d1d5dc] mb-8">
+    <header className="w-full flex justify-between items-center py-4 px-5 border-b border-[#d1d5dc] mb-8">
       <Link href="/" className="flex flex-row gap-1">
         <img src="/logo.svg" alt="Logo" className="h-6 w-6 sm:h-8 sm:w-8" />
         <p className="hidden sm:block text-xl font-bold text-left mt-0.5">
@@ -30,7 +30,7 @@ export default function Header() {
           href="https://github.com/nutlope/billsplit"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex justify-end items-center gap-1.5 p-2 rounded bg-[#d04f17]"
+          className="flex justify-end items-center gap-1.5 p-2 sm:px-[14px] sm:py-[7px] rounded bg-[#d04f17]"
         >
           <img
             src="/github.svg"
