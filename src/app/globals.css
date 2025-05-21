@@ -2,11 +2,14 @@
 @import "tw-animate-css";
 
 @keyframes scan {
-  from {
+  0% {
     top: 0;
   }
-  to {
+  50% {
     top: 100%;
+  }
+  100% {
+    top: 0;
   }
 }
 
