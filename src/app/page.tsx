@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
-import Link from "next/link";
+import ClearStorageLink from "@/components/ClearStorageLink";
 
 export const metadata: Metadata = {
   title: "BillSplit - Split your bill easily with AI",
@@ -34,19 +33,15 @@ export default function Home() {
         </div>
 
         <div className="w-full max-w-xs sm:max-w-sm flex flex-col gap-3">
-          <Link href="/app?mode=camera">
-            <Button className="w-full">
-              <img src="/camera.svg" className="w-4 h-4" />
-              <p className="text-base font-semibold">Scan Receipt</p>
-            </Button>
-          </Link>
-          <Link href="/app?mode=manual">
-            <Button variant="secondary" className="w-full">
-              <p className="text-base font-medium text-[#364153]">
-                Enter Manually
-              </p>
-            </Button>
-          </Link>
+          <ClearStorageLink href="/app?mode=camera">
+            <img src="/camera.svg" className="w-4 h-4" />
+            <p className="text-base font-semibold">Scan Receipt</p>
+          </ClearStorageLink>
+          <ClearStorageLink href="/app?mode=manual" variant="secondary">
+            <p className="text-base font-medium text-[#364153]">
+              Enter Manually
+            </p>
+          </ClearStorageLink>
         </div>
       </main>
     </>
