@@ -49,6 +49,13 @@ export const ReceiptItems = ({
   const tax = useMemo(() => {
     return formObject.watch("tax");
   }, [formObject.watch("tax")]);
+  
+  // Get currency from form
+  const currency = formObject.watch("currency");
+  const currencySymbol = currency?.symbol || "$";
+  
+  // Log what currency we have (for debugging)
+  console.log('ReceiptItems currency:', currency);
 
   return (
     <>
@@ -79,6 +86,7 @@ export const ReceiptItems = ({
             />
             <InputPrice
               value={field.price}
+              currencySymbol={currency?.symbol}
               onChange={(value) => {
                 formObject.setValue(`billItems.${index}.price`, value);
               }}
@@ -172,6 +180,7 @@ export const ReceiptItems = ({
             }}>Tip:</p>
             <InputPrice
               value={tip}
+              currencySymbol={currencySymbol}
               onChange={(value) => formObject.setValue("tip", value)}
               className="w-full"
               placeholder="0.00"
@@ -190,6 +199,7 @@ export const ReceiptItems = ({
             }}>Tax:</p>
             <InputPrice
               value={tax}
+              currencySymbol={currencySymbol}
               onChange={(value) => formObject.setValue("tax", value)}
               className="w-full"
               placeholder="0.00"
@@ -225,7 +235,7 @@ export const ReceiptItems = ({
               display: 'flex',
               alignItems: 'baseline'
             }}>
-              <span style={{ fontSize: '1.25rem', marginRight: '0.125rem' }}>$</span>
+              <span style={{ fontSize: '1.25rem', marginRight: '0.125rem' }}>{currencySymbol}</span>
               <span>{total.toFixed(2)}</span>
             </span>
           </div>

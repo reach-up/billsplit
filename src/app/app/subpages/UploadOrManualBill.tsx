@@ -4,7 +4,7 @@ import { DatePicker } from "@/components/DatePicker";
 import SubPageHeader from "@/components/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
-import { BillForm } from "../types";
+import { BillForm, CURRENCIES, Currency } from "../types";
 import Dropzone from "react-dropzone";
 import { useEffect, useMemo, useRef, useState } from "react";
 // Removed S3 upload dependency
@@ -13,6 +13,7 @@ import { createId } from "../utils";
 import Decimal from "decimal.js";
 import logger from "../../../lib/logger";
 import { useTheme } from "@/context/ThemeContext";
+import { CurrencySelector } from "@/components/CurrencySelector";
 
 // Custom scanning animation styles
 const ScanningAnimation = () => (
@@ -382,6 +383,24 @@ export const UploadOrManualBill = ({
       );
       formObject.setValue("tax", new Decimal(extractedData?.tax || 0));
       formObject.setValue("tip", new Decimal(extractedData?.tip || 0));
+      
+      // Handle currency if detected from OCR
+      if (extractedData?.currencyCode) {
+        const detectedCurrency = CURRENCIES.find(c => c.code === extractedData.currencyCode);
+        if (detectedCurrency) {
+          formObject.setValue("currency", detectedCurrency);
+          logger.info("Currency detected from receipt", { 
+            context: { 
+              scanId, 
+              currency: extractedData.currencyCode,
+              symbol: extractedData.currencySymbol
+            } 
+          });
+        }
+      } else {
+        // Set default currency (USD) if none detected
+        formObject.setValue("currency", CURRENCIES[0]);
+      }
 
       // Set scan success state instead of immediately going forward
       setScanSuccess(true);
@@ -419,11 +438,26 @@ export const UploadOrManualBill = ({
         <div className="flex flex-col items-center justify-center py-8 space-y-8">
           <div className="relative w-72 h-96 bg-white dark:bg-neutral-800 rounded-lg shadow-md border border-neutral-200 dark:border-neutral-700 overflow-hidden">
             {file && (
-              <img 
-                src={URL.createObjectURL(file)} 
-                alt="Receipt being scanned" 
-                className="w-full h-full object-contain"
-              />
+              file.type === 'application/pdf' ? (
+                <object
+                  data={URL.createObjectURL(file)}
+                  type="application/pdf"
+                  className="w-full h-full"
+                >
+                  <div className="flex items-center justify-center h-full w-full flex-col p-4 text-center">
+                    <svg className="w-12 h-12 text-primary-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-sm">PDF Receipt</p>
+                  </div>
+                </object>
+              ) : (
+                <img 
+                  src={URL.createObjectURL(file)} 
+                  alt="Receipt being scanned" 
+                  className="w-full h-full object-contain"
+                />
+              )
             )}
             
             {/* Scanning effect */}
@@ -509,6 +543,14 @@ export const UploadOrManualBill = ({
                   items detected
                 </span>
               </div>
+              
+              <div className="flex flex-col gap-1 mt-2">
+                <h3 className="text-sm font-medium text-primary-700 uppercase tracking-wide">Currency</h3>
+                <p className="text-xl font-semibold text-neutral-900">
+                  {watch("currency")?.symbol} {watch("currency")?.code} 
+                  <span className="text-sm text-neutral-500">({watch("currency")?.name})</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -587,17 +629,17 @@ export const UploadOrManualBill = ({
         <form className="w-full space-y-6">
           <div className="space-y-1.5">
             <label
-              htmlFor="restaurant-name"
+              htmlFor="businessName"
               className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
               Restaurant Name
             </label>
             <input
-              {...register("businessName")}
-              id="restaurant-name"
               type="text"
-              className="w-full p-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition shadow-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
-              placeholder="e.g., The Cheesecake Factory"
+              id="businessName"
+              placeholder="Enter restaurant name"
+              className="w-full border border-neutral-300 dark:border-neutral-700 rounded-md px-3 py-2 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              {...register("businessName")}
             />
           </div>
 
@@ -606,7 +648,7 @@ export const UploadOrManualBill = ({
               htmlFor="date"
               className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Receipt Date
+              Date
             </label>
             <DatePicker
               date={watch("date")}
@@ -618,9 +660,25 @@ export const UploadOrManualBill = ({
             />
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Select the date from the receipt</p>
           </div>
+
+          <div className="space-y-1.5">
+            <label
+              htmlFor="currency"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+            >
+              Currency
+            </label>
+            <CurrencySelector 
+              value={watch("currency")} 
+              onChange={(currency: Currency) => formObject.setValue("currency", currency)}
+            />
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Select the currency used on the receipt</p>
+          </div>
           
           <div className="pt-4">
             <button
+              type="button"
+              onClick={goForward}
               style={{
                 width: '100%',
                 padding: '1rem 1.5rem',
@@ -638,7 +696,6 @@ export const UploadOrManualBill = ({
                 cursor: 'pointer',
                 transition: 'all 0.2s ease-in-out'
               }}
-              onClick={goForward}
             >
               <span style={{color: 'white', fontSize: '18px', fontWeight: 'bold'}}>Continue to Add Items</span>
               <svg style={{width: '1.25rem', height: '1.25rem', transition: 'transform 0.2s'}} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

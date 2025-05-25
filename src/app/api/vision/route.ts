@@ -42,14 +42,13 @@ export async function POST(req: Request) {
     const endJson = new Date();
     const processingTime = (endJson.getTime() - start.getTime()) / 1000;
     
-    // Log success metrics
-    logger.api.info(`OCR processing successful`, { 
+    // Log the COMPLETE response from OCR for debugging
+    logger.api.info(`OCR processing complete`, { 
       context: { 
         requestId,
         processingTimeSeconds: processingTime,
-        itemsExtracted: output.billItems?.length || 0,
-        businessName: output.businessName,
-        outputKeys: Object.keys(output)
+        fullOutput: JSON.stringify(output),
+        detectedCurrency: output.currencyCode || 'None'
       }
     });
     

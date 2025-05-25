@@ -66,11 +66,18 @@ export const PeopleAndSplit = ({
     append({ name: "", id: createId() });
   };
 
+  // Get currency from form
+  const currency = formObject.watch("currency");
+  const currencySymbol = currency?.symbol || "$";
+  
+  // Log what currency we have (for debugging)
+  console.log('PeopleAndSplit currency:', currency);
+  
   const isDisabled = useMemo(() => {
     const people = formObject.watch("people") || [];
     const products = formObject.watch("billItems") || [];
     const splitEvenly = formObject.watch("splitEvenly");
-
+    
     if (people.length === 0 || people.some((field) => field.name === "")) {
       return true;
     }
@@ -78,7 +85,7 @@ export const PeopleAndSplit = ({
     if (splitEvenly) {
       return false;
     }
-
+    
     return products.some((product) => !product.assignedTo?.length);
   }, [
     formObject.watch("people"),
@@ -201,7 +208,7 @@ export const PeopleAndSplit = ({
                     </div>
                   </div>
                   <div className="text-base font-medium text-right" style={{minWidth: '80px'}}>
-                    <span className="text-[#6a7282]">$</span>
+                    <span className="text-[#6a7282]">{currencySymbol}</span>
                     <span className="text-[#1e2939] whitespace-nowrap" style={{paddingLeft: '2px'}}>
                       {parseFloat(product.price.toString()).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </span>

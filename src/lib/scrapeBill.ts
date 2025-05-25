@@ -28,6 +28,14 @@ export const extractSchema = z.object({
     .describe(
       "Tip or Gratuity amount, not percentage we need money amount and if multiple tips are shown just output the medium one"
     ),
+  currencyCode: z
+    .string()
+    .optional()
+    .describe("The currency code detected from the receipt (e.g., USD, EUR, GBP)"),
+  currencySymbol: z
+    .string()
+    .optional()
+    .describe("The currency symbol detected from the receipt (e.g., $, €, £)"),
 });
 
 export type ExtractSchemaType = z.infer<typeof extractSchema>;
@@ -87,13 +95,13 @@ async function processGeminiVision(
     4. TAX AMOUNT:
        - Extract the total tax amount in decimal format
 
-    Format your response as a JSON object with these properties:
-    - 'businessName' (string): Name of the restaurant or business
-    - 'date' (string): Receipt date in YYYY-MM-DD format
-    - 'items' (array): List of items, each with 'item' (string) and 'price' (number) properties
-    - 'taxAmount' (number): The total tax amount
-
-    Example: {"businessName": "BURGER KING #2187", "date": "2023-05-15", "items": [{"item": "Whopper Meal", "price": 12.99}, {"item": "Large Fries", "price": 4.50}], "taxAmount": 1.75}
+    5. CURRENCY (Critical):
+       - Identify the currency used on the receipt
+       - IMPORTANT: Look for currency symbols ($, €, £, ₹, etc.) or currency codes (USD, EUR, INR, etc.)
+       - Check for currency codes next to prices (e.g., INR 1300, $10.99)
+       - Consider price values as a clue - very large numbers for food items (like 1300 for a meal) often indicate INR
+       - If the receipt is from India, Rwanda, or Kigali, pay extra attention to INR currency
+       - Return both the currency code (USD, EUR, INR) and symbol ($, €, ₹)
   `;
   
   // Prepare the API payload
@@ -130,9 +138,11 @@ async function processGeminiVision(
               "propertyOrdering": ["item", "price"]
             }
           },
-          "taxAmount": { "type": "NUMBER" }
+          "taxAmount": { "type": "NUMBER" },
+          "currencyCode": { "type": "STRING" },
+          "currencySymbol": { "type": "STRING" }
         },
-        "propertyOrdering": ["businessName", "date", "items", "taxAmount"]
+        "propertyOrdering": ["businessName", "date", "items", "taxAmount", "currencyCode", "currencySymbol"]
       }
     }
   };
@@ -194,6 +204,8 @@ async function processGeminiVision(
           taxAmount?: number;
           businessName?: string;
           date?: string;
+          currencyCode?: string;  // Currency code (e.g., USD, EUR)
+          currencySymbol?: string;  // Currency symbol (e.g., $, €)
           [key: string]: any; // Allow any other property names
         };
         
@@ -218,6 +230,24 @@ async function processGeminiVision(
           context: { businessName, date } 
         });
         
+        // Get currency info directly from API response
+        let currencyCode: string | undefined = typedOutput.currencyCode;
+        let currencySymbol: string | undefined = typedOutput.currencySymbol;
+        
+        // Log raw response for debugging
+        logger.ocr.info('Raw OCR JSON response', {
+          context: {
+            fullResponse: jsonText
+          }
+        });
+        
+        // Log detected currency (if any)
+        if (currencyCode || currencySymbol) {
+          logger.ocr.info('Currency detected from OCR', {
+            context: { currencyCode, currencySymbol }
+          });
+        }
+        
         const mappedOutput: ExtractSchemaType = {
           businessName,
           date,
@@ -226,7 +256,9 @@ async function processGeminiVision(
             price: item.price
           })),
           tax: typedOutput.taxAmount || 0,
-          tip: 0 // Default since Gemini doesn't extract this
+          tip: 0, // Default since Gemini doesn't extract this
+          currencyCode,
+          currencySymbol
         };
         
         // Log summary of extracted data

@@ -26,6 +26,13 @@ export const SplitSummary = ({
   const isEvenly = useMemo(() => {
     return formObject.watch().splitEvenly;
   }, [formObject.watch()]);
+  
+  // Get currency from form
+  const currency = formObject.watch("currency");
+  const currencySymbol = currency?.symbol || "$";
+  
+  // Log what currency we have (for debugging)
+  console.log('SplitSummary currency:', currency);
 
   const total = getTotal(formObject.watch());
 
@@ -146,7 +153,7 @@ export const SplitSummary = ({
             </p>
             <p className="font-medium text-right">
               <span className="text-base font-medium text-right text-[#6a7282]">
-                $
+                {currencySymbol}
               </span>
               <span className="text-base font-medium text-right text-[#1e2939]">
                 {" "}
