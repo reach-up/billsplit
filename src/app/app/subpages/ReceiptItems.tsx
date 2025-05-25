@@ -1,3 +1,5 @@
+"use client";
+
 import SubPageHeader from "@/components/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
@@ -58,7 +60,17 @@ export const ReceiptItems = ({
       <div className="flex flex-col gap-3">
         {fields.map((field, index) => (
           <div
-            className="flex justify-start items-center relative gap-2"
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              position: 'relative',
+              gap: '0.5rem',
+              padding: '0.25rem',
+              borderRadius: '0.375rem',
+              background: index % 2 === 0 ? 'rgba(201, 169, 244, 0.1)' : 'transparent',
+              transition: 'background-color 0.2s'
+            }}
             key={field._id}
           >
             <InputText
@@ -73,25 +85,91 @@ export const ReceiptItems = ({
             />
             <button
               onClick={() => remove(index)}
-              className=" hover:opacity-80 cursor-pointer"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.5rem',
+                borderRadius: '0.375rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
             >
-              <img src="/trash.svg" className="size-[42px]" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H5H21" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </button>
           </div>
         ))}
         <button
           onClick={handleAddItem}
-          className="flex justify-start items-center w-full relative overflow-hidden gap-1.5 p-3 rounded-lg bg-[#f4eeec] border border-[#d1d5dc] hover:bg-[#ebe2df] transition-colors cursor-pointer"
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            width: '100%',
+            position: 'relative',
+            overflow: 'hidden',
+            gap: '0.375rem',
+            padding: '0.75rem',
+            borderRadius: '0.5rem',
+            background: 'linear-gradient(to right, #F8F0FF, #EFFCF6)',
+            border: '1px solid #C9A9F4',
+            transition: 'all 0.2s ease-in-out',
+            cursor: 'pointer'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(to right, #E4D3FB, #B5F5E0)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(to right, #F8F0FF, #EFFCF6)';
+          }}
         >
-          <img src="/add.svg" className="size-4" />
-          <p className="flex-grow-0  text-base font-medium text-center text-[#1d293d]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="#6D28D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <p style={{
+            flexGrow: 0,
+            fontSize: '1rem',
+            fontWeight: '500',
+            textAlign: 'center',
+            color: '#6D28D9'
+          }}>
             Add Item
           </p>
         </button>
-        <div className="h-[1px] bg-[#D1D5DC] -mx-[100vw] mt-5" />
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-left text-[#1e2939]">Tip:</p>
+
+        <div style={{
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #C9A9F4, transparent)',
+          margin: '1.25rem 0'
+        }} />
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '0.75rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem'
+          }}>
+            <p style={{
+              fontSize: '0.875rem',
+              textAlign: 'left',
+              color: '#4C1D95',
+              fontWeight: '500'
+            }}>Tip:</p>
             <InputPrice
               value={tip}
               onChange={(value) => formObject.setValue("tip", value)}
@@ -99,8 +177,17 @@ export const ReceiptItems = ({
               placeholder="0.00"
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-left text-[#1e2939]">Tax:</p>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem'
+          }}>
+            <p style={{
+              fontSize: '0.875rem',
+              textAlign: 'left',
+              color: '#4C1D95',
+              fontWeight: '500'
+            }}>Tax:</p>
             <InputPrice
               value={tax}
               onChange={(value) => formObject.setValue("tax", value)}
@@ -109,18 +196,69 @@ export const ReceiptItems = ({
             />
           </div>
         </div>
-        <div className="flex flex-row gap-2 items-end justify-end">
-          <p className="text-sm text-right text-[#1e2939]">
-            Total: <span className="font-medium text-[#6a7282]">$ </span>
-          </p>
-          <p className="text-2xl font-medium text-right text-[#1e2939] -mb-0.5">
-            {total.toFixed(2)}
-          </p>
+
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          marginTop: '0.75rem',
+          background: 'linear-gradient(to right, transparent, rgba(201, 169, 244, 0.1))',
+          padding: '0.5rem 1rem',
+          borderRadius: '0.5rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: '0.125rem'
+          }}>
+            <span style={{
+              fontSize: '1rem',
+              color: '#4C1D95',
+              fontWeight: '500'
+            }}>Total:</span>
+            <span style={{ 
+              color: '#6D28D9', 
+              fontWeight: '600',
+              fontSize: '1.5rem',
+              marginLeft: '0.5rem',
+              display: 'flex',
+              alignItems: 'baseline'
+            }}>
+              <span style={{ fontSize: '1.25rem', marginRight: '0.125rem' }}>$</span>
+              <span>{total.toFixed(2)}</span>
+            </span>
+          </div>
         </div>
       </div>
-      <Button className="w-full mt-6" onClick={goForward} disabled={isDisabled}>
-        <span>Continue</span>
-      </Button>
+      <button
+        style={{
+          width: '100%',
+          marginTop: '1.5rem',
+          padding: '1rem 1.5rem',
+          borderRadius: '0.5rem',
+          background: isDisabled ? '#E4D3FB' : 'linear-gradient(to right, #6D28D9, #5B21B6)',
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '1.125rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          border: isDisabled ? '1px solid #C9A9F4' : '1px solid #5B21B6',
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
+          opacity: isDisabled ? 0.7 : 1,
+          transition: 'all 0.2s ease-in-out'
+        }}
+        onClick={goForward}
+        disabled={isDisabled}
+      >
+        <span style={{color: 'white', fontSize: '18px', fontWeight: 'bold'}}>Continue</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
     </>
   );
 };

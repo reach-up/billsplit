@@ -1,3 +1,5 @@
+"use client";
+
 import SubPageHeader from "@/components/SubPageHeader";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
@@ -198,10 +200,10 @@ export const PeopleAndSplit = ({
                       })}
                     </div>
                   </div>
-                  <div className="text-base font-medium text-right">
+                  <div className="text-base font-medium text-right" style={{minWidth: '80px'}}>
                     <span className="text-[#6a7282]">$</span>
-                    <span className="text-[#1e2939] whitespace-nowrap">
-                      {product.price.toString()}
+                    <span className="text-[#1e2939] whitespace-nowrap" style={{paddingLeft: '2px'}}>
+                      {parseFloat(product.price.toString()).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </span>
                   </div>
                 </div>
