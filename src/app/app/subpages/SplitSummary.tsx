@@ -194,11 +194,11 @@ export const SplitSummary = ({
 Here's how we should split this bill:
 ${people
   .map((person, index) => {
-    return `- ${person.name}: $${amounts[index].toString()}`;
+    return `- ${person.name}: ${currencySymbol}${amounts[index].toString()}`;
   })
   .join("\n")}
   
-Total: ${total}`;
+Total: ${currencySymbol}${total}`;
 
             navigator.clipboard.writeText(formattedString);
 
