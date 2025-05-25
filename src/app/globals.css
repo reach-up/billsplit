@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Dark mode transitions */
+* {
+  transition-property: color, background-color, border-color;
+  transition-duration: 200ms;
+}
+
 @keyframes scan {
   0% {
     top: 0;
@@ -17,7 +23,8 @@
   animation: scan 2s linear infinite;
 }
 
-@theme inline {
+/* Theme variables */
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-instrument-sans);
@@ -125,13 +132,15 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Base styles */
+* {
+  border-color: var(--color-border);
+  outline-color: var(--color-ring, rgba(0, 0, 0, 0.5));
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }
 
 @layer utilities {

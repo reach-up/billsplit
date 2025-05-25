@@ -1,9 +1,21 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { theme } from "../lib/theme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Header() {
+  const { isDarkMode, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  // This effect ensures we don't have hydration mismatches
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Use the actual theme after mounting to prevent hydration mismatch
+  const currentTheme = mounted ? (isDarkMode ? 'dark' : 'light') : 'light';
   return (
     <header style={{
       width: '100%',
@@ -11,14 +23,16 @@ export default function Header() {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '1rem 1.25rem',
-      borderBottom: '1px solid #E4D3FB',
+      borderBottom: currentTheme === 'dark' ? '1px solid #374151' : '1px solid #E4D3FB',
       marginBottom: '1.5rem',
       position: 'sticky',
       top: 0,
-      background: 'linear-gradient(to right, white, #F8F0FF)',
+      backgroundColor: currentTheme === 'dark' ? '#1F2937' : 'transparent',
+      backgroundImage: currentTheme === 'dark' ? 'none' : 'linear-gradient(to right, white, #F8F0FF)',
       backdropFilter: 'blur(8px)',
       zIndex: 10,
-      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+      boxShadow: currentTheme === 'dark' ? '0 1px 2px rgba(0, 0, 0, 0.15)' : '0 1px 2px rgba(0, 0, 0, 0.05)',
+      transition: 'background-color 0.3s, background-image 0.3s, border-bottom 0.3s, box-shadow 0.3s'
     }}>
       <Link href="/" style={{
         display: 'flex',
@@ -34,8 +48,10 @@ export default function Header() {
           justifyContent: 'center',
           background: 'linear-gradient(to bottom right, #6D28D9, #0E9F6E)',
           borderRadius: '0.75rem',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          transition: 'transform 0.2s',
+          boxShadow: currentTheme === 'dark' 
+            ? '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)' 
+            : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          transition: 'transform 0.2s, box-shadow 0.3s',
         }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M2 8.5H22M6 16.5H8M10.5 16.5H16M6 12.5H10M12.5 12.5H18M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -102,46 +118,63 @@ export default function Header() {
         </a>
         
         <button 
+          onClick={toggleTheme}
           style={{
             padding: '0.5rem',
             borderRadius: '0.5rem',
-            color: '#4B5563',
+            color: currentTheme === 'dark' ? '#D1D5DB' : '#4B5563',
             backgroundColor: 'transparent',
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.2s'
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#F8F0FF';
-            e.currentTarget.style.color = '#6D28D9';
+            e.currentTarget.style.backgroundColor = currentTheme === 'dark' ? '#374151' : '#F8F0FF';
+            e.currentTarget.style.color = currentTheme === 'dark' ? '#E4D3FB' : '#6D28D9';
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#4B5563';
+            e.currentTarget.style.color = currentTheme === 'dark' ? '#D1D5DB' : '#4B5563';
           }}
           aria-label="Toggle theme"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2"></path>
-            <path d="M12 20v2"></path>
-            <path d="m4.93 4.93 1.41 1.41"></path>
-            <path d="m17.66 17.66 1.41 1.41"></path>
-            <path d="M2 12h2"></path>
-            <path d="M20 12h2"></path>
-            <path d="m6.34 17.66-1.41 1.41"></path>
-            <path d="m19.07 4.93-1.41 1.41"></path>
-          </svg>
+          {currentTheme === 'light' ? (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+          ) : (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+          )}
         </button>
       </div>
     </header>

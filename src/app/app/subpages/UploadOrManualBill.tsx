@@ -12,6 +12,7 @@ import { ExtractSchemaType } from "@/lib/scrapeBill";
 import { createId } from "../utils";
 import Decimal from "decimal.js";
 import logger from "../../../lib/logger";
+import { useTheme } from "@/context/ThemeContext";
 
 // Custom scanning animation styles
 const ScanningAnimation = () => (
@@ -65,6 +66,7 @@ export const UploadOrManualBill = ({
   goForward: () => void;
   formObject: UseFormReturn<BillForm>;
 }) => {
+  const { theme } = useTheme();
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
@@ -131,49 +133,71 @@ export const UploadOrManualBill = ({
     }
   }, [file]);
 
-  // Function to compress an image before sending it to the API
-  const compressImage = async (imageFile: File, maxWidth = 1200): Promise<string> => {
+  // Function to process file before sending it to the API
+  const processFile = async (file: File, maxWidth = 1200): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          // Calculate new dimensions while maintaining aspect ratio
-          let width = img.width;
-          let height = img.height;
-          
-          if (width > maxWidth) {
-            const ratio = maxWidth / width;
-            width = maxWidth;
-            height = height * ratio;
-          }
-          
-          // Create a canvas to resize the image
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          
-          // Draw the image on the canvas with the new dimensions
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Could not get canvas context'));
+      // Check if file is PDF
+      if (file.type === 'application/pdf') {
+        // For PDFs, just read as base64
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+          if (!event.target?.result) {
+            reject(new Error('Failed to read PDF file'));
             return;
           }
           
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Convert to base64 with reduced quality
-          const quality = 0.8; // 80% quality, adjust as needed
-          const base64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+          // Extract the base64 content without the data URL prefix
+          const base64 = (event.target.result as string).split(',')[1];
           resolve(base64);
         };
         
-        img.onerror = () => reject(new Error('Failed to load image'));
-        img.src = event.target?.result as string;
-      };
-      
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsDataURL(imageFile);
+        reader.onerror = () => reject(new Error('Failed to read PDF file'));
+        reader.readAsDataURL(file);
+      } else {
+        // For images, compress them
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+          if (!event.target?.result) {
+            reject(new Error('Failed to read image file'));
+            return;
+          }
+          
+          const img = new Image();
+          img.onload = () => {
+            // Calculate new dimensions while maintaining aspect ratio
+            const aspectRatio = img.height / img.width;
+            const width = Math.min(maxWidth, img.width);
+            const height = width * aspectRatio;
+            
+            // Create canvas and resize image
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw the image on the canvas with the new dimensions
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              reject(new Error('Could not get canvas context'));
+              return;
+            }
+            
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to base64 with reduced quality
+            const quality = 0.8; // 80% quality, adjust as needed
+            const base64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+            resolve(base64);
+          };
+          
+          img.onerror = () => reject(new Error('Failed to load image'));
+          img.src = event.target?.result as string;
+        };
+        
+        reader.onerror = () => reject(new Error('Failed to read image file'));
+        reader.readAsDataURL(file);
+      }
     });
   };
 
@@ -266,35 +290,41 @@ export const UploadOrManualBill = ({
         tags: ["user-action", "scan-receipt"]
       });
       
-      // Compress the image before sending to the API
+      // Process the file (image or PDF) before sending to the API
       const originalSizeKB = (fileToUse.size / 1024).toFixed(2);
-      const base64Image = await compressImage(fileToUse);
+      const base64Image = await processFile(fileToUse);
       
-      // Log image compression metrics
-      logger.info("Image compressed for OCR", {
+      // Determine file type for logging and processing
+      const mimeType = fileToUse.type === 'application/pdf' ? 'application/pdf' : 'image/jpeg';
+      const fileType = fileToUse.type === 'application/pdf' ? 'PDF' : 'Image';
+      
+      // Log file processing metrics
+      logger.info(`${fileType} processed for OCR`, {
         context: {
           scanId,
           originalSizeKB,
-          compressedLength: base64Image.length,
-          compressionRatio: (fileToUse.size / (base64Image.length * 0.75)).toFixed(2) // Approximate ratio
+          fileType,
+          processedLength: base64Image.length,
+          compressionRatio: fileToUse.type === 'application/pdf' ? '1.0' : 
+            (fileToUse.size / (base64Image.length * 0.75)).toFixed(2) // Approximate ratio for images
         }
       });
       
       logger.info("File converted to base64, calling API", { 
         context: { 
           scanId, 
-          mimeType: 'image/jpeg', 
+          mimeType, 
           base64Length: base64Image.length 
         } 
       });
       
-      // Make the API call with the compressed image
+      // Make the API call with the processed file (image or PDF)
       const apiStartTime = Date.now();
       const response = await fetch("/api/vision", {
         method: "POST",
         body: JSON.stringify({
           base64Image,
-          mimeType: 'image/jpeg', // We're always converting to JPEG
+          mimeType, // Pass the correct MIME type (image/jpeg or application/pdf)
         }),
         headers: {
           "Content-Type": "application/json",
@@ -387,7 +417,7 @@ export const UploadOrManualBill = ({
         />
         
         <div className="flex flex-col items-center justify-center py-8 space-y-8">
-          <div className="relative w-72 h-96 bg-white rounded-lg shadow-md border border-neutral-200 overflow-hidden">
+          <div className="relative w-72 h-96 bg-white dark:bg-neutral-800 rounded-lg shadow-md border border-neutral-200 dark:border-neutral-700 overflow-hidden">
             {file && (
               <img 
                 src={URL.createObjectURL(file)} 
@@ -414,7 +444,7 @@ export const UploadOrManualBill = ({
               <span className="text-primary-700 font-medium animate-pulse">Identifying items and prices...</span>
             </div>
             
-            <p className="text-sm text-neutral-500">Please wait while we analyze your receipt. This usually takes about 15-20 seconds.</p>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">Please wait while we analyze your receipt. This usually takes about 15-20 seconds.</p>
           </div>
         </div>
       </>
@@ -558,7 +588,7 @@ export const UploadOrManualBill = ({
           <div className="space-y-1.5">
             <label
               htmlFor="restaurant-name"
-              className="block text-sm font-medium text-neutral-700"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
               Restaurant Name
             </label>
@@ -566,7 +596,7 @@ export const UploadOrManualBill = ({
               {...register("businessName")}
               id="restaurant-name"
               type="text"
-              className="w-full p-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition shadow-sm bg-white text-neutral-900"
+              className="w-full p-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition shadow-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
               placeholder="e.g., The Cheesecake Factory"
             />
           </div>
@@ -574,7 +604,7 @@ export const UploadOrManualBill = ({
           <div className="space-y-1.5">
             <label
               htmlFor="date"
-              className="block text-sm font-medium text-neutral-700"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
               Receipt Date
             </label>
@@ -586,7 +616,7 @@ export const UploadOrManualBill = ({
                 });
               }}
             />
-            <p className="text-xs text-neutral-500 mt-1">Select the date from the receipt</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Select the date from the receipt</p>
           </div>
           
           <div className="pt-4">
@@ -639,7 +669,8 @@ export const UploadOrManualBill = ({
           borderRadius: '0.75rem',
           overflow: 'hidden',
           boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)',
-          backgroundColor: '#000'
+          backgroundColor: theme === 'dark' ? '#000' : '#fff',
+          transition: 'background-color 0.3s ease'
         }}>
           <video 
             ref={videoRef} 
@@ -744,10 +775,10 @@ export const UploadOrManualBill = ({
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0.5rem',
-            background: '#f3f4f6',
+            background: theme === 'dark' ? '#333' : '#f3f4f6',
             border: '1px solid #e5e7eb',
             borderRadius: '0.5rem',
-            color: '#4b5563',
+            color: theme === 'dark' ? '#fff' : '#4b5563',
             fontWeight: '500',
             cursor: 'pointer',
             transition: 'all 0.2s ease'
@@ -757,7 +788,7 @@ export const UploadOrManualBill = ({
             <path d="M12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M19 12C19 11.1716 19 10.3432 19 9.51492C19 7.58122 17.4188 6 15.4851 6C14.6974 6 13.9175 6 13.1491 6C12.424 6 11.5 5 11 5C10.5 5 9.67596 5 9 5C8.32404 5 7.5 5 6.84088 5C4.80616 5 3 6.67893 3 8.8C3 9.65354 3 10.5071 3 11.3606C3 12.214 3 13.0675 3 13.921C3 16.8406 5.15229 18 7.89669 18H16C17.6569 18 19 16.6569 19 15V12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          Take a picture with your camera
+          Take a picture or scan a PDF
         </button>
       )}
       
@@ -765,6 +796,7 @@ export const UploadOrManualBill = ({
         multiple={false}
         accept={{
           "image/*": [".jpg", ".jpeg", ".png"],
+          "application/pdf": [".pdf"]
         }}
         onDrop={(acceptedFiles) => {
           if (isLoading) return;
@@ -801,10 +833,10 @@ export const UploadOrManualBill = ({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center text-center">
-                    <p className="text-lg font-medium text-neutral-800 mb-1">
+                    <p className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-1">
                       Drag & drop your receipt
                     </p>
-                    <p className="text-sm text-neutral-600 mb-4">
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
                       or click to browse files
                     </p>
                   </div>
@@ -815,11 +847,25 @@ export const UploadOrManualBill = ({
             {file ? (
               <div className="flex flex-col items-center gap-4 w-full">
                 <div className="relative w-full max-w-[240px] group">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="Receipt"
-                    className="h-auto w-full object-contain rounded-lg border border-neutral-200 shadow-md"
-                  />
+                  {file.type === 'application/pdf' ? (
+                    <div className="w-full aspect-[3/4] bg-neutral-50 flex flex-col items-center justify-center rounded-lg border border-neutral-200 shadow-md overflow-hidden">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary-600 mb-2">
+                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9 13H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9 17H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9 9H10H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <p className="text-sm font-medium text-neutral-800">{file.name}</p>
+                      <p className="text-xs text-neutral-500 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  ) : (
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="Receipt"
+                      className="h-auto w-full object-contain rounded-lg border border-neutral-200 shadow-md"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -843,6 +889,11 @@ export const UploadOrManualBill = ({
               </div>
             ) : (
               <div className="flex flex-col items-center py-6">
+                {!isDragActive && (
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2 transition-colors duration-300">
+                    Supports images (JPG, PNG) and PDF files
+                  </p>
+                )}
 
                 {isDragActive && (
                   <div className="flex flex-col items-center text-center">

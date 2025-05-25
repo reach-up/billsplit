@@ -1,17 +1,40 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useTheme } from "@/context/ThemeContext";
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { isDarkMode } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Don't apply any theme-specific styles until client-side hydration is complete
+  const backgroundColor = mounted ? (isDarkMode ? '#111827' : 'transparent') : 'transparent';
+  
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(to bottom right, #E4D3FB, white, #B5F5E0)',
-      backgroundAttachment: 'fixed'
+      backgroundColor: backgroundColor,
+      backgroundImage: isDarkMode 
+        ? 'none' 
+        : 'linear-gradient(to bottom right, #E4D3FB, white, #B5F5E0)',
+      backgroundAttachment: 'fixed',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      transition: 'background-color 0.3s ease, background-image 0.3s ease'
     }}>
       <div style={{
         position: 'absolute',
         inset: 0,
         backgroundImage: 'url("/pattern.svg")',
-        opacity: 0.05,
+        opacity: isDarkMode ? 0.03 : 0.05,
         pointerEvents: 'none',
-        backgroundRepeat: 'repeat'
+        backgroundRepeat: 'repeat',
+        transition: 'opacity 0.3s ease'
       }}></div>
       <div style={{
         position: 'relative',
@@ -32,11 +55,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div style={{
             width: '100%',
             maxWidth: '28rem',
-            background: 'white',
+            backgroundColor: isDarkMode ? '#1F2937' : 'white',
             borderRadius: '0.75rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-            border: '1px solid #E4D3FB',
-            padding: '1.5rem 2rem'
+            boxShadow: isDarkMode 
+              ? '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4)' 
+              : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            border: isDarkMode ? '1px solid #374151' : '1px solid #E4D3FB',
+            padding: '1.5rem 2rem',
+            transition: 'background-color 0.3s, border 0.3s, box-shadow 0.3s'
           }}>
             {children}
           </div>
