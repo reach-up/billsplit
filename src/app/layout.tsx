@@ -24,6 +24,30 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "BillSplit"
   },
+  // OpenGraph/social media metadata
+  openGraph: {
+    title: "BillSplit - Scan. Tap. Split.",
+    description: "Snap the receipt, tap your items, see who owes what. No sign-ups, no math, no drama.",
+    url: "https://usebillsplit.com",
+    siteName: "BillSplit",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "BillSplit App"
+      }
+    ],
+    locale: "en_US",
+    type: "website"
+  },
+  // Twitter card metadata
+  twitter: {
+    card: "summary_large_image",
+    title: "BillSplit - Scan. Tap. Split.",
+    description: "Snap the receipt, tap your items, see who owes what. No sign-ups, no math, no drama.",
+    images: ["/og.png"],
+  },
 };
 
 export const viewport = {
