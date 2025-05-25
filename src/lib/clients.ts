@@ -1,15 +1,9 @@
-import Together from "together-ai";
+/**
+ * Clients configuration file
+ */
 
-const options: ConstructorParameters<typeof Together>[0] = {
-  apiKey: process.env.TOGETHER_API_KEY,
-};
+// Gemini API key
+export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-if (process.env.HELICONE_API_KEY) {
-  options.baseURL = "https://together.helicone.ai/v1";
-  options.defaultHeaders = {
-    "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-    "Helicone-Property-Appname": "billsplit",
-  };
-}
-
-export const togetherBaseClient = new Together(options);
+// Base URL for Gemini API
+export const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";

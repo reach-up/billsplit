@@ -6,10 +6,11 @@ import { UseFormReturn } from "react-hook-form";
 import { BillForm } from "../types";
 import Dropzone from "react-dropzone";
 import { useEffect, useMemo, useState } from "react";
-import { useS3Upload } from "next-s3-upload";
+// Removed S3 upload dependency
 import { ExtractSchemaType } from "@/lib/scrapeBill";
 import { createId } from "../utils";
 import Decimal from "decimal.js";
+import logger from "../../../lib/logger";
 
 export const UploadOrManualBill = ({
   isManual,
@@ -24,7 +25,7 @@ export const UploadOrManualBill = ({
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { uploadToS3 } = useS3Upload();
+  const [scanSuccess, setScanSuccess] = useState(false);
   const { register, watch } = formObject;
 
   useEffect(() => {
@@ -44,27 +45,143 @@ export const UploadOrManualBill = ({
     return !file;
   }, [file]);
 
+  // Function to compress an image before sending it to the API
+  const compressImage = async (imageFile: File, maxWidth = 1200): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // Calculate new dimensions while maintaining aspect ratio
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > maxWidth) {
+            const ratio = maxWidth / width;
+            width = maxWidth;
+            height = height * ratio;
+          }
+          
+          // Create a canvas to resize the image
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Draw the image on the canvas with the new dimensions
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to base64 with reduced quality
+          const quality = 0.8; // 80% quality, adjust as needed
+          const base64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+          resolve(base64);
+        };
+        
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = event.target?.result as string;
+      };
+      
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
   const processBill = async () => {
     if (!file) return;
     setIsLoading(true);
     localStorage.removeItem("billFormData");
+    
+    // Generate a unique scan ID for tracking this operation in logs
+    const scanId = `scan-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    
     try {
-      const uploadedBill = await uploadToS3(file);
-
-      uploadedBill.url;
-
+      
+      // Log scan attempt with file metadata
+      logger.info("Receipt scan initiated", {
+        context: {
+          scanId,
+          fileType: file.type,
+          fileSize: file.size,
+          fileName: file.name
+        },
+        tags: ["user-action", "scan-receipt"]
+      });
+      
+      // Compress the image before sending to the API
+      const originalSizeKB = (file.size / 1024).toFixed(2);
+      const base64Image = await compressImage(file);
+      
+      // Log image compression metrics
+      logger.info("Image compressed for OCR", {
+        context: {
+          scanId,
+          originalSizeKB,
+          compressedLength: base64Image.length,
+          compressionRatio: (file.size / (base64Image.length * 0.75)).toFixed(2) // Approximate ratio
+        }
+      });
+      
+      logger.info("File converted to base64, calling API", { 
+        context: { 
+          scanId, 
+          mimeType: 'image/jpeg', 
+          base64Length: base64Image.length 
+        } 
+      });
+      
+      // Make the API call with the compressed image
+      const apiStartTime = Date.now();
       const response = await fetch("/api/vision", {
         method: "POST",
         body: JSON.stringify({
-          billUrl: uploadedBill.url,
+          base64Image,
+          mimeType: 'image/jpeg', // We're always converting to JPEG
         }),
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+      
+      const apiDuration = (Date.now() - apiStartTime) / 1000;
+      logger.info("API response received", { 
+        context: { 
+          scanId, 
+          status: response.status, 
+          durationSeconds: apiDuration 
+        } 
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        logger.error("API returned error response", { 
+          context: { 
+            scanId, 
+            status: response.status,
+            error: errorData.error 
+          } 
+        });
+        throw new Error(errorData.error || "Failed to process receipt");
+      }
+      
       const extractedData = (await response.json()) as ExtractSchemaType;
-
+      
+      // Log successful extraction details
+      logger.info("Receipt processed successfully", { 
+        context: { 
+          scanId,
+          businessName: extractedData.businessName,
+          date: extractedData.date,
+          itemCount: extractedData.billItems?.length || 0,
+          hasTax: !!extractedData.tax
+        },
+        tags: ["scan-success"]
+      });
+      
       formObject.setValue("businessName", extractedData.businessName);
       extractedData.date &&
         formObject.setValue("date", new Date(extractedData.date));
@@ -82,15 +199,80 @@ export const UploadOrManualBill = ({
       formObject.setValue("tax", new Decimal(extractedData?.tax || 0));
       formObject.setValue("tip", new Decimal(extractedData?.tip || 0));
 
-      goForward();
+      // Set scan success state instead of immediately going forward
+      setScanSuccess(true);
     } catch (e) {
-      // toast error couldn't process bill visually
-      console.error("Error processing bill:", e);
+      // Enhanced error handling with structured logging
+      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+      logger.error("Error processing receipt", { 
+        context: { 
+          scanId, // Use the same scanId for tracking the entire operation
+          error: errorMessage,
+          stack: e instanceof Error ? e.stack : undefined 
+        } 
+      });
+      alert(`Failed to process the receipt: ${errorMessage}`); // Use proper toast notification in production
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Show successful scan result with restaurant details
+  if (scanSuccess) {
+    const businessName = watch("businessName");
+    const date = watch("date");
+    const itemCount = watch("billItems")?.length || 0;
+    
+    return (
+      <>
+        <SubPageHeader
+          title="Receipt Scanned Successfully"
+          description="We've extracted the following information"
+          onBack={() => setScanSuccess(false)}
+        />
+        
+        <div className="w-full bg-[#faf7f5] p-5 rounded-xl border border-[#e7e5e4] mb-6">
+          <div className="flex flex-col gap-4">
+            <div>
+              <h3 className="text-base font-semibold text-[#374151]">Restaurant</h3>
+              <p className="text-lg text-[#111827]">{businessName || "Unknown"}</p>
+            </div>
+            
+            <div>
+              <h3 className="text-base font-semibold text-[#374151]">Date</h3>
+              <p className="text-lg text-[#111827]">
+                {date ? date.toLocaleDateString() : "Unknown"}
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-base font-semibold text-[#374151]">Items Found</h3>
+              <p className="text-lg text-[#111827]">{itemCount} items</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col gap-3">
+          <Button className="w-full" onClick={goForward}>
+            <span>Continue with These Details</span>
+          </Button>
+          
+          <Button 
+            variant="secondary"
+            className="w-full" 
+            onClick={() => {
+              // Toggle to manual mode to allow editing
+              setScanSuccess(false);
+            }}
+          >
+            <span>Edit Details</span>
+          </Button>
+        </div>
+      </>
+    );
+  }
+  
+  // Manual entry form
   if (isManual) {
     return (
       <>

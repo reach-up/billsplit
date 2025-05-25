@@ -20,14 +20,13 @@
 ## How it works
 
 1. User uploads a picture of the bill
-2. The app processes the PDF using Together.ai with Vision models and Json mode
+2. The app processes the image directly using Google's Gemini Vision API with JSON mode
 3. The app let the user choose how to split items and add people names
 4. The app displays the final summary with the split of the bill
 
 ## Cloning & running
 
 1. Fork or clone the repo
-2. Create an account at https://togetherai.link for the LLM
-3. Create an account at https://aws.amazon.com/ for the S3 bucket
-4. Create a `.env` (use the `.example.env` for reference) and replace the API keys
-5. Run `pnpm install` and `pnpm run dev` to install dependencies and run locally
+2. Create an account at https://aistudio.google.com/app to get a Gemini API key
+3. Create a `.env` (use the `.example.env` for reference) and add your Gemini API key
+4. Run `pnpm install` and `pnpm run dev` to install dependencies and run locally

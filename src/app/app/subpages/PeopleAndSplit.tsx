@@ -184,11 +184,7 @@ export const PeopleAndSplit = ({
                                   )
                                 : [...currentAssigned, person.id];
 
-                              console.log(
-                                "isAssigned",
-                                isAssigned,
-                                newAssigned
-                              );
+                              // Assignment logic handled in updateProduct
                               updateProduct(productIndex, {
                                 ...product,
                                 assignedTo: newAssigned,
